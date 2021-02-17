@@ -1,8 +1,13 @@
 import { Flex, Text } from "@chakra-ui/react";
+import { withUrqlClient } from "next-urql";
+import React from "react";
+import { urqlClient } from "src/urql/urqlClient";
 import { BUCKET_BASE_URL } from "src/utils/constants";
 import { Layout } from "./_layout";
 
-const Index = () => {
+interface indexProps {}
+
+const index: React.FC<indexProps> = () => {
   const backgroundImg = `url('${BUCKET_BASE_URL}/landing/hive.jpeg')`;
   return (
     <Layout>
@@ -23,4 +28,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default withUrqlClient(urqlClient)(index);

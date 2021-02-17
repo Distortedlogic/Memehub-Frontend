@@ -4,7 +4,7 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import Head from "next/head";
 import { Fragment } from "react";
-import { Container } from "../components/Container";
+import { Container } from "src/components/utils/Container";
 import theme from "../theme";
 
 library.add(fab, fas);

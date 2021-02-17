@@ -25,15 +25,17 @@ const InputField: React.FC<InputFieldProps> = ({
   const [field, { error }] = useField(props.name);
   return (
     <FormControl flex={1} isInvalid={!!error}>
-      {label ? (
-        <FormLabel color="white" htmlFor={field.name}>
-          {label}
-        </FormLabel>
-      ) : null}
+      {label ? <FormLabel htmlFor={field.name}>{label}</FormLabel> : null}
       {textArea ? (
         <Textarea {...field} {...props} id={field.name} />
       ) : (
-        <Input {...field} {...props} id={field.name} />
+        <Input
+          borderColor="gray"
+          {...field}
+          {...props}
+          id={field.name}
+          textColor="white"
+        />
       )}
       {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
     </FormControl>

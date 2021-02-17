@@ -131,6 +131,7 @@ export type QueryFollowingMemesArgs = {
 export type QueryUserRanksArgs = {
   timeFrame?: Maybe<Scalars['String']>;
   userId?: Maybe<Scalars['String']>;
+  num?: Maybe<Scalars['Int']>;
 };
 
 
@@ -971,6 +972,7 @@ export type UserRankFragment = (
 );
 
 export type UserRanksQueryVariables = Exact<{
+  num: Scalars['Int'];
   userId?: Maybe<Scalars['String']>;
   timeFrame?: Maybe<Scalars['String']>;
 }>;
@@ -1717,8 +1719,8 @@ export function useTopRatedMemesQuery(options: Omit<Urql.UseQueryArgs<TopRatedMe
   return Urql.useQuery<TopRatedMemesQuery>({ query: TopRatedMemesDocument, ...options });
 };
 export const UserRanksDocument = gql`
-    query UserRanks($userId: String, $timeFrame: String) {
-  userRanks(userId: $userId, timeFrame: $timeFrame) {
+    query UserRanks($num: Int!, $userId: String, $timeFrame: String) {
+  userRanks(num: $num, userId: $userId, timeFrame: $timeFrame) {
     ...rank
   }
 }

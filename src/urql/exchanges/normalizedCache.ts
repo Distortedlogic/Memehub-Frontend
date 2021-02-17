@@ -4,7 +4,7 @@ import { hiveLogin } from "./../cache/login";
 import { logout } from "./../cache/logout";
 
 export const normalizedCache = cacheExchange({
-  keys: {},
+  keys: { PaginatedRanks: () => null, Rank: () => null },
   resolvers: {
     Query: {},
   },
