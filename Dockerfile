@@ -4,7 +4,7 @@ WORKDIR /app
 
 ENV PATH=/app/node_modules/.bin:$PATH ENV='dev'
 
-COPY package*.json /app
+COPY package*.json /app/
 RUN npm install --silent
 
 CMD ["npm", "run", "dev"]
