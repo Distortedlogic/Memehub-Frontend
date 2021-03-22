@@ -1,6 +1,6 @@
 overwrite: true
 schema: "http://127.0.0.1:5000/graphql"
-documents: "../backend/src/**/*.gql"
+documents: "../Memehub-Backend/src/**/*.gql"
 generates:
   src/generated/graphql.tsx:
     plugins:

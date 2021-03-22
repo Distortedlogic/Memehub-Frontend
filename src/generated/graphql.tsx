@@ -221,7 +221,8 @@ export type Meme = {
   ocrText: Scalars['String'];
   url: Scalars['String'];
   userId: Scalars['String'];
-  stonk: Scalars['String'];
+  memeClf: Scalars['String'];
+  memeClfCorrect: Scalars['Boolean'];
   version: Scalars['String'];
   user: User;
   season: Scalars['Int'];
@@ -301,6 +302,11 @@ export type RedditMeme = {
   subreddit: Scalars['String'];
   title: Scalars['String'];
   url: Scalars['String'];
+  memeText: Scalars['String'];
+  isATemplate: Scalars['Boolean'];
+  memeClf: Scalars['String'];
+  memeClfCorrect: Scalars['Boolean'];
+  version: Scalars['String'];
   timestamp: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   upvoteRatio: Scalars['Float'];
