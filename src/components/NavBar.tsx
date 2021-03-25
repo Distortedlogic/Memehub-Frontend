@@ -1,7 +1,9 @@
 import { Search2Icon } from "@chakra-ui/icons";
 import {
   Avatar,
+  Box,
   Button,
+  Divider,
   Flex,
   Image,
   Input,
@@ -12,13 +14,13 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
-  useDisclosure,
+  Text,
   useToast,
 } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { useHiveLoginMutation, useMeQuery } from "src/generated/graphql";
 import { BUCKET_BASE_URL, canUseKeychain } from "src/utils/constants";
 import InputField from "./utils/InputField";
@@ -81,28 +83,28 @@ const Login: React.FC<LoginProps> = () => {
 
 interface LoginButtonProps {}
 const LoginButton: React.FC<LoginButtonProps> = () => {
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const [openModal, setOpenModal] = useState<string | undefined>(undefined);
   return (
     <>
-      <Button onClick={onOpen}>
+      <Button onClick={() => setOpenModal("login")}>
         <Image h="15px" mr={3} src={`${BUCKET_BASE_URL}/icons/person.png`} />
         Login
       </Button>
-      <LoginModal isOpen={isOpen} onClose={onClose} />
+      <LoginModal openModal={openModal} setOpenModal={setOpenModal} />
     </>
   );
 };
 
 interface LoginModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  openModal: string | undefined;
+  setOpenModal: Dispatch<SetStateAction<string | undefined>>;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ openModal, setOpenModal }) => {
   const toast = useToast();
   const router = useRouter();
   const [, hiveLoginFN] = useHiveLoginMutation();
-  const handleLogin = async (username: string, onClose: () => void) => {
+  const handleLogin = async (username: string) => {
     const message = new Date().toString();
     window.hive_keychain.requestSignBuffer(
       username,
@@ -125,10 +127,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             });
           } else {
             if (router.query.next) {
-              onClose();
+              setOpenModal(undefined);
               router.push(router.query.next as string);
             } else {
-              onClose();
+              setOpenModal(undefined);
             }
           }
         } else {
@@ -143,7 +145,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     );
   };
   return (
-    <Modal isCentered preserveScrollBarGap onClose={onClose} isOpen={isOpen}>
+    <Modal
+      isCentered
+      preserveScrollBarGap
+      onClose={() => setOpenModal(undefined)}
+      isOpen={openModal === "login"}
+    >
       <ModalOverlay />
       <ModalContent rounded="md" backgroundColor="black">
         <ModalBody px={8} py={8}>
@@ -151,41 +158,85 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             <Formik
               initialValues={{ username: "" }}
               onSubmit={async (values) => {
-                handleLogin(values.username, onClose);
+                handleLogin(values.username);
               }}
             >
-              {({ isSubmitting }) => (
+              {({ submitForm }) => (
                 <Form>
                   <Flex direction="column">
                     <InputField mb={3} placeholder="username" name="username" />
-                    <Button
-                      type="submit"
-                      isLoading={isSubmitting}
-                      color="white"
+                    <Box
+                      border="1px solid gray"
+                      rounded="md"
+                      backgroundColor="black"
+                      p={2}
+                      _hover={{ cursor: "pointer" }}
+                      onClick={() => submitForm()}
                     >
-                      Login
-                    </Button>
+                      <Flex justifyContent="center" alignItems="center">
+                        <Image
+                          h="30px"
+                          src={`${BUCKET_BASE_URL}/logos/hive_keychain.png`}
+                        />
+                      </Flex>
+                    </Box>
                   </Flex>
                 </Form>
               )}
             </Formik>
           ) : (
             <Flex direction="column">
+              <Link
+                _hover={{}}
+                _focus={{}}
+                href="https://peakd.com/about/faq"
+                target="_blank"
+              >
+                <Button w="100%" mb={4} color="white">
+                  What is the Hive Blockchain?
+                </Button>
+              </Link>
               <Button
                 mb={4}
                 color="white"
-                onClick={() => router.push("/newHiveAcct")}
+                onClick={() => router.push("/onboarding/newHiveAcct")}
               >
                 Get Hive Blockchain Account
               </Button>
               <Button
                 color="white"
-                onClick={() => router.push("/installHiveKeychain")}
+                onClick={() => router.push("/onboarding/installHiveKeychain")}
               >
                 Install Hive Keychain
               </Button>
             </Flex>
           )}
+          <Divider mt={4} mb={2} />
+          <Flex direction="column" justifyContent="center" alignItems="center">
+            <Text my={1} fontSize="15px" color="white" fontWeight="bold">
+              Login With Memehub
+            </Text>
+          </Flex>
+          <Box
+            border="1px solid gray"
+            my={2}
+            rounded="md"
+            backgroundColor="black"
+            p={2}
+            _hover={{ cursor: "pointer" }}
+          >
+            <Flex justifyContent="center" alignItems="center">
+              <Image h="35px" src={`${BUCKET_BASE_URL}/logos/main-logo.png`} />
+            </Flex>
+          </Box>
+          <Flex px={4} mb={4} justifyContent="space-between">
+            <Box _hover={{ cursor: "pointer" }}>
+              <Text color="white">register</Text>
+            </Box>
+            <Box _hover={{ cursor: "pointer" }}>
+              <Text color="white">forgot password</Text>
+            </Box>
+          </Flex>
         </ModalBody>
       </ModalContent>
     </Modal>

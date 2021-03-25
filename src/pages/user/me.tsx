@@ -22,7 +22,7 @@ import {
 } from "src/generated/graphql";
 import { urqlClient } from "src/urql/urqlClient";
 import { BUCKET_BASE_URL } from "src/utils/constants";
-import { Layout } from "../_layout";
+import { SingleColLayout } from "../_singleColLayout";
 
 interface meProps {}
 
@@ -36,7 +36,7 @@ const me: React.FC<meProps> = () => {
     return <></>;
   }
   return (
-    <Layout>
+    <SingleColLayout>
       <Grid h="100%" w="100%" templateColumns="2fr 1fr">
         <Flex direction="column">
           <Flex m={2} p={2} justify="space-between">
@@ -72,7 +72,7 @@ const me: React.FC<meProps> = () => {
           <Leaderboards />
         </Flex>
       </Grid>
-    </Layout>
+    </SingleColLayout>
   );
 };
 

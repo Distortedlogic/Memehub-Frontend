@@ -28,7 +28,6 @@ export type Query = {
   userMemes?: Maybe<PaginatedMemes>;
   meme?: Maybe<Meme>;
   newMemes: PaginatedMemes;
-  communityMemes: PaginatedMemes;
   topRatedMemes: PaginatedMemes;
   hotMemes: PaginatedMemes;
   followingMemes?: Maybe<PaginatedMemes>;
@@ -97,14 +96,6 @@ export type QueryMemeArgs = {
 export type QueryNewMemesArgs = {
   cursor?: Maybe<Scalars['String']>;
   take: Scalars['Int'];
-};
-
-
-export type QueryCommunityMemesArgs = {
-  skip?: Maybe<Scalars['Int']>;
-  days?: Maybe<Scalars['Int']>;
-  take: Scalars['Int'];
-  community: Scalars['String'];
 };
 
 
@@ -226,7 +217,6 @@ export type Meme = {
   version: Scalars['String'];
   user: User;
   season: Scalars['Int'];
-  community: Scalars['String'];
   comments: Array<Comment>;
   numComments: Scalars['Int'];
   memeVotes: Array<MemeVote>;
@@ -306,6 +296,8 @@ export type RedditMeme = {
   isATemplate: Scalars['Boolean'];
   memeClf: Scalars['String'];
   memeClfCorrect: Scalars['Boolean'];
+  stonk: Scalars['Boolean'];
+  stonkCorrect: Scalars['Boolean'];
   version: Scalars['String'];
   timestamp: Scalars['Int'];
   createdAt: Scalars['DateTime'];
@@ -400,7 +392,7 @@ export type MutationDeleteMemeArgs = {
 
 export type MutationPostMemeArgs = {
   title: Scalars['String'];
-  community: Scalars['String'];
+  postToHive: Scalars['Boolean'];
 };
 
 
@@ -513,6 +505,22 @@ export type RedditScore = {
   huScore: Scalars['Float'];
   lowestRatio: Scalars['Float'];
   redditorId: Scalars['Int'];
+};
+
+export type Market = {
+  __typename?: 'Market';
+  name: Scalars['String'];
+  numPosts: Scalars['Int'];
+  totalUpvotes: Scalars['Int'];
+  upvotesPerPost: Scalars['Int'];
+};
+
+export type StonkMarket = {
+  __typename?: 'StonkMarket';
+  createdAt: Scalars['DateTime'];
+  source: Scalars['String'];
+  subsource: Scalars['String'];
+  market: Array<Market>;
 };
 
 export type RedditMaxTimestampQueryVariables = Exact<{ [key: string]: never; }>;
@@ -727,7 +735,7 @@ export type UnfollowMutation = (
 
 export type MyMemeFragment = (
   { __typename?: 'Meme' }
-  & Pick<Meme, 'id' | 'ups' | 'downs' | 'ratio' | 'createdAt' | 'title' | 'url' | 'numComments' | 'community' | 'isHive'>
+  & Pick<Meme, 'id' | 'ups' | 'downs' | 'ratio' | 'createdAt' | 'title' | 'url' | 'numComments' | 'isHive'>
 );
 
 export type MemeFragment = (
@@ -748,7 +756,7 @@ export type UserMemeFragment = (
 
 export type PostMemeMutationVariables = Exact<{
   title: Scalars['String'];
-  community: Scalars['String'];
+  postToHive: Scalars['Boolean'];
 }>;
 
 
@@ -924,26 +932,6 @@ export type HotMemesQuery = (
   ) }
 );
 
-export type CommunityMemesQueryVariables = Exact<{
-  community: Scalars['String'];
-  take: Scalars['Int'];
-  skip?: Maybe<Scalars['Int']>;
-  days?: Maybe<Scalars['Int']>;
-}>;
-
-
-export type CommunityMemesQuery = (
-  { __typename?: 'Query' }
-  & { communityMemes: (
-    { __typename?: 'PaginatedMemes' }
-    & Pick<PaginatedMemes, 'hasMore'>
-    & { items: Array<(
-      { __typename?: 'Meme' }
-      & UserMemeFragment
-    )> }
-  ) }
-);
-
 export type TopRatedMemesQueryVariables = Exact<{
   take: Scalars['Int'];
   skip: Scalars['Int'];
@@ -1063,7 +1051,7 @@ export type RedisGetMutation = (
 
 export type UserFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'avatar' | 'username' | 'isHive'>
+  & Pick<User, 'id' | 'avatar' | 'username' | 'isHive' | 'totalPoints'>
 );
 
 export type StatsFragment = (
@@ -1276,6 +1264,7 @@ export const UserFragmentDoc = gql`
   avatar
   username
   isHive
+  totalPoints
 }
     `;
 export const UserCommentFragmentDoc = gql`
@@ -1303,7 +1292,6 @@ export const MyMemeFragmentDoc = gql`
   title
   url
   numComments
-  community
   isHive
 }
     `;
@@ -1556,8 +1544,8 @@ export function useUnfollowMutation() {
   return Urql.useMutation<UnfollowMutation, UnfollowMutationVariables>(UnfollowDocument);
 };
 export const PostMemeDocument = gql`
-    mutation PostMeme($title: String!, $community: String!) {
-  postMeme(title: $title, community: $community) {
+    mutation PostMeme($title: String!, $postToHive: Boolean!) {
+  postMeme(title: $title, postToHive: $postToHive) {
     ...myMeme
   }
 }
@@ -1695,20 +1683,6 @@ export const HotMemesDocument = gql`
 
 export function useHotMemesQuery(options: Omit<Urql.UseQueryArgs<HotMemesQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<HotMemesQuery>({ query: HotMemesDocument, ...options });
-};
-export const CommunityMemesDocument = gql`
-    query CommunityMemes($community: String!, $take: Int!, $skip: Int, $days: Int) {
-  communityMemes(community: $community, take: $take, skip: $skip, days: $days) {
-    items {
-      ...userMeme
-    }
-    hasMore
-  }
-}
-    ${UserMemeFragmentDoc}`;
-
-export function useCommunityMemesQuery(options: Omit<Urql.UseQueryArgs<CommunityMemesQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<CommunityMemesQuery>({ query: CommunityMemesDocument, ...options });
 };
 export const TopRatedMemesDocument = gql`
     query TopRatedMemes($take: Int!, $skip: Int!, $days: Int!) {
