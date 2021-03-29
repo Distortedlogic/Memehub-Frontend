@@ -1,8 +1,18 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { Avatar, Box, Divider, Flex, Stack, Text } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Image,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import NextLink from "next/link";
 import React, { useEffect, useState } from "react";
 import { useRankingQuery, UserRankFragment } from "src/generated/graphql";
+import { BUCKET_BASE_URL } from "src/utils/constants";
 
 const idx_timeframe: Record<number, string> = {
   0: "day",
@@ -71,8 +81,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   };
   const title = titles[timeFrame];
   return (
-    <Box p={2} rounded="md" backgroundColor="black">
-      <Stack>
+    <Flex direction="column">
+      <Stack p={2}>
         <Flex mt={2} justifyContent="space-around" alignItems="center">
           <Text ml={4} fontSize="25px" textAlign="center">
             Leaderboards
@@ -104,7 +114,11 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
           <Leader key={rank.user.id} rank={rank} />
         ))}
       </Stack>
-    </Box>
+      <Button>
+        <Image height="25px" src={BUCKET_BASE_URL + "/icons/rank.png"} />
+        <Text ml={4}>View Rankings</Text>
+      </Button>
+    </Flex>
   );
 };
 
@@ -126,7 +140,7 @@ const Leader: React.FC<LeaderProps> = ({ rank }) => {
             <Avatar border="1px solid white" size="sm" src={rank.user.avatar} />
             <Text ml={2}>{rank.user.username}</Text>
           </Flex>
-          <Text textAlign="center">{rank.totalPoints}</Text>
+          <Text textAlign="center">{rank.mhp}</Text>
         </Flex>
       </NextLink>
       <Divider mt={2} />

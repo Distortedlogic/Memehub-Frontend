@@ -1,4 +1,4 @@
-import { Search2Icon } from "@chakra-ui/icons";
+import { ChevronDownIcon, Search2Icon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -8,13 +8,19 @@ import {
   Image,
   Input,
   InputGroup,
-  InputLeftElement,
+  InputRightElement,
   Link,
   Modal,
   ModalBody,
   ModalContent,
   ModalOverlay,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
   Text,
+  Tooltip,
   useToast,
 } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
@@ -28,6 +34,7 @@ import InputField from "./utils/InputField";
 interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = () => {
+  const router = useRouter();
   return (
     <Flex
       alignItems="center"
@@ -36,17 +43,6 @@ export const NavBar: React.FC<NavBarProps> = () => {
       h="100%"
       px={4}
     >
-      <Flex>
-        <InputGroup>
-          <InputLeftElement pointerEvents="none" children={<Search2Icon />} />
-          <Input
-            border="none"
-            rounded="none"
-            borderBottom="1px solid gray"
-            placeholder="search..."
-          />
-        </InputGroup>
-      </Flex>
       <Flex justifyContent="center" alignContent="center">
         <NextLink href="/">
           <Link>
@@ -58,7 +54,65 @@ export const NavBar: React.FC<NavBarProps> = () => {
           </Link>
         </NextLink>
       </Flex>
-      <Login />
+      <Flex>
+        <InputGroup>
+          <Input
+            border="none"
+            rounded="none"
+            borderBottom="1px solid gray"
+            placeholder="search..."
+          />
+          <InputRightElement pointerEvents="none" children={<Search2Icon />} />
+        </InputGroup>
+      </Flex>
+      <Flex justifyContent="center" alignItems="center">
+        <Link
+          _focus={{}}
+          _hover={{ cursor: "pointer" }}
+          href="https://peakd.com/c/hive-189111/created"
+          target="_blank"
+          mr={8}
+        >
+          <Tooltip hasArrow label="Hive Community">
+            <Image height="25px" src={BUCKET_BASE_URL + "/icons/hive.png"} />
+          </Tooltip>
+        </Link>
+        <Link
+          _focus={{}}
+          _hover={{ cursor: "pointer" }}
+          href="https://discord.gg/QAcbE7Y"
+          target="_blank"
+          mr={8}
+        >
+          <Tooltip hasArrow label="Discord Server">
+            <Image height="30px" src={BUCKET_BASE_URL + "/icons/discord.png"} />
+          </Tooltip>
+        </Link>
+        <Link
+          _focus={{}}
+          _hover={{ cursor: "pointer" }}
+          href="https://imgflip.com/memegenerator"
+          target="_blank"
+          mr={8}
+        >
+          <Tooltip hasArrow label="Create A Meme">
+            <Image
+              height="25px"
+              src={BUCKET_BASE_URL + "/icons/makeMeme.png"}
+            />
+          </Tooltip>
+        </Link>
+        <Tooltip hasArrow label="Upload A Meme">
+          <Image
+            _hover={{ cursor: "pointer" }}
+            onClick={() => router.push("/upload")}
+            height="30px"
+            src={BUCKET_BASE_URL + "/icons/rocket.png"}
+            mr={8}
+          />
+        </Tooltip>
+        <Login />
+      </Flex>
     </Flex>
   );
 };
@@ -66,18 +120,65 @@ export const NavBar: React.FC<NavBarProps> = () => {
 interface LoginProps {}
 
 const Login: React.FC<LoginProps> = () => {
-  const [{ data, error, fetching }] = useMeQuery({});
   const router = useRouter();
+  const [{ data, error, fetching }] = useMeQuery({});
   if (error) console.log(error);
-  if (fetching || !data?.me) return <LoginButton />;
+  if (fetching || error) return <Button>Login</Button>;
+  if (!data?.me) return <LoginButton />;
   else
     return (
-      <Avatar
-        _hover={{ cursor: "pointer" }}
-        onClick={() => router.push("/user/me")}
-        size="sm"
-        src={data.me.avatar}
-      />
+      <Popover>
+        <PopoverTrigger>
+          <Flex
+            _hover={{ cursor: "pointer" }}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Avatar size="sm" src={data.me.avatar} />
+            <Text ml={2}>{data.me.username}</Text>
+            <ChevronDownIcon ml={2} />
+          </Flex>
+        </PopoverTrigger>
+        <PopoverContent>
+          <PopoverArrow />
+          <PopoverBody rounded="md" backgroundColor="black" size="sm" p={0}>
+            <Flex
+              _hover={{
+                cursor: "pointer",
+                backgroundColor: "gray.800",
+                roundedTop: "md",
+              }}
+              p={2}
+              justifyContent="center"
+              alignItems="center"
+              onClick={() => router.push("/user/me")}
+            >
+              <Image
+                height="25px"
+                src={BUCKET_BASE_URL + "/icons/person.png"}
+              />
+              <Text ml={4}>Profile</Text>
+            </Flex>
+            <Flex
+              _hover={{
+                cursor: "pointer",
+                backgroundColor: "gray.800",
+                roundedTop: "md",
+              }}
+              p={2}
+              justifyContent="center"
+              alignItems="center"
+              onClick={() => router.push("/wallet")}
+            >
+              <Image
+                height="25px"
+                src={BUCKET_BASE_URL + "/icons/wallet.png"}
+              />
+              <Text ml={4}>Wallet</Text>
+            </Flex>
+          </PopoverBody>
+        </PopoverContent>
+      </Popover>
     );
 };
 

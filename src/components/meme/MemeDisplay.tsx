@@ -1,5 +1,3 @@
-import { Button } from "@chakra-ui/button";
-import Icon from "@chakra-ui/icon";
 import { Image } from "@chakra-ui/image";
 import { Box, BoxProps, Flex, Text } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
@@ -13,6 +11,7 @@ import {
   useUpVoteMemeMutation,
 } from "src/generated/graphql";
 import { ratioToColorGrade } from "src/utils/functions";
+import { VoteButton } from "../utils/VoteButton";
 dayjs.extend(relativeTime);
 
 interface MemeDisplayProps extends BoxProps {
@@ -78,50 +77,35 @@ export const MemeDisplay: React.FC<MemeDisplayProps> = (props) => {
           <Box mr={2}>
             <AvatarLink
               userId={meme.user.id}
-              size="50px"
+              size="md"
               src={meme.user.avatar}
             />
           </Box>
           <Box>
-            <Text color="white" fontSize="md" fontWeight="bold">
+            <Text fontSize="md" fontWeight="bold">
               {meme.user.username}
             </Text>
-            <Text color="white" fontSize="sm">
-              {dayjs(meme.createdAt).fromNow()}
-            </Text>
+            <Text fontSize="sm">{dayjs(meme.createdAt).fromNow()}</Text>
           </Box>
         </Flex>
         <Text color={color} fontSize="50px" fontWeight="bold">
           {grade}
         </Text>
         <Flex justifyContent="center" alignItems="center">
-          <Button
-            isActive={meme.hasDownvoted}
-            isLoading={downFetching}
-            variantColor={meme.hasDownvoted ? "red" : "gray"}
-            onClick={handleDownvote}
-            size="lg"
-            mr={2}
-            aria-label="downvote"
-          >
-            <Icon name={"arrow-down" as any} />
-            <Text fontSize="15px" fontWeight="bold">
-              {meme.downs}
-            </Text>
-          </Button>
-          <Button
-            isActive={meme.hasUpvoted}
-            isLoading={upFetching}
-            variantColor={meme.hasUpvoted ? "green" : "gray"}
-            onClick={handleUpvote}
-            size="lg"
-            aria-label="upvote"
-          >
-            <Icon name="arrow-up" />
-            <Text fontSize="15px" fontWeight="bold">
-              {meme.ups}
-            </Text>
-          </Button>
+          <VoteButton
+            downvote
+            handleVote={handleDownvote}
+            fetching={downFetching}
+            hasVoted={meme.hasDownvoted}
+            numVotes={meme.downs}
+          />
+          <VoteButton
+            upvote
+            handleVote={handleUpvote}
+            fetching={upFetching}
+            hasVoted={meme.hasUpvoted}
+            numVotes={meme.ups}
+          />
         </Flex>
       </Flex>
     </Box>

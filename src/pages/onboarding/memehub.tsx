@@ -205,7 +205,7 @@ export const Register: React.FC<RegisterProps> = ({ setMode }) => {
                     setMode("login");
                   }}
                 >
-                  <Text color="white">Login</Text>
+                  <Text>Login</Text>
                 </Box>
                 <Box
                   _hover={{ cursor: "pointer" }}
@@ -213,16 +213,10 @@ export const Register: React.FC<RegisterProps> = ({ setMode }) => {
                     setMode("forgotPassword");
                   }}
                 >
-                  <Text color="white">Forgot Password?</Text>
+                  <Text>Forgot Password?</Text>
                 </Box>
               </Flex>
-              <Button
-                mb={2}
-                mt={4}
-                type="submit"
-                variantColor="blue"
-                isLoading={isSubmitting}
-              >
+              <Button mb={2} mt={4} type="submit" isLoading={isSubmitting}>
                 Register with Memehub
               </Button>
               <Divider />
@@ -241,7 +235,7 @@ export const Register: React.FC<RegisterProps> = ({ setMode }) => {
                 target="_blank"
               >
                 <Flex justifyContent="center" alignContent="center ">
-                  <Text color="white">What is Hive?</Text>
+                  <Text>What is Hive?</Text>
                 </Flex>
               </Link>
             </Flex>
@@ -294,7 +288,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ setMode }) => {
                     setMode("login");
                   }}
                 >
-                  <Text color="white">Login</Text>
+                  <Text>Login</Text>
                 </Box>
                 <Box
                   _hover={{ cursor: "pointer" }}
@@ -302,16 +296,10 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ setMode }) => {
                     setMode("register");
                   }}
                 >
-                  <Text color="white">Register</Text>
+                  <Text>Register</Text>
                 </Box>
               </Flex>
-              <Button
-                mb={2}
-                mt={4}
-                type="submit"
-                variantColor="blue"
-                isLoading={isSubmitting}
-              >
+              <Button mb={2} mt={4} type="submit" isLoading={isSubmitting}>
                 Send Reset Email
               </Button>
             </Flex>

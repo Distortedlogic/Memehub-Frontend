@@ -21,7 +21,7 @@ export const VoteButton: React.FC<VoteButtonProps> = (props) => {
     <Button
       isActive={hasVoted}
       isLoading={fetching}
-      variantColor={hasVoted ? (upvote ? "green" : "red") : "gray"}
+      colorScheme={hasVoted ? (upvote ? "green" : "red") : "gray"}
       onClick={handleVote}
       size="lg"
       m={1}

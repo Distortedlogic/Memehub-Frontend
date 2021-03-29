@@ -1,4 +1,4 @@
-import { Box, Text } from "@chakra-ui/layout";
+import { Flex, Text } from "@chakra-ui/layout";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
@@ -8,6 +8,7 @@ import { MemeDisplay } from "src/components/meme/MemeDisplay";
 import { useMemeQuery } from "src/generated/graphql";
 import { urqlClient } from "src/urql/urqlClient";
 import { ssr } from "src/utils/constants";
+import { DoubleColLayout } from "../_doubleColLayout";
 import { SingleColLayout } from "../_singleColLayout";
 
 interface MemeProps {}
@@ -30,13 +31,15 @@ const Meme: React.FC<MemeProps> = ({}) => {
     );
   }
   return (
-    <SingleColLayout>
-      <Box>
-        <MemeDisplay meme={data.meme} />
-        <PostCommentField meme={data.meme} />
-        <CommentStack memeId={data.meme.id} />
-      </Box>
-    </SingleColLayout>
+    <DoubleColLayout>
+      <Flex justifyContent="center" alignItems="center">
+        <Flex direction="column" w="60%">
+          <MemeDisplay meme={data.meme} />
+          <PostCommentField meme={data.meme} />
+          <CommentStack memeId={data.meme.id} />
+        </Flex>
+      </Flex>
+    </DoubleColLayout>
   );
 };
 

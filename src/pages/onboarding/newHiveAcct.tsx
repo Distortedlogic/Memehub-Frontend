@@ -92,7 +92,7 @@ const NewHiveAcct: React.FC<NewHiveAcctProps> = () => {
           >
             {role}
           </Text>
-          <Text textAlign="center" color="white" mb={2}>
+          <Text textAlign="center" mb={2}>
             {keys[role]}
           </Text>
         </Box>
@@ -161,7 +161,6 @@ const NewHiveAcct: React.FC<NewHiveAcctProps> = () => {
                 <Flex direction="column" justifyContent="center" w="60%">
                   <Text
                     textAlign="center"
-                    color="white"
                     fontWeight="bold"
                     fontSize="25px"
                     mb={2}
@@ -183,12 +182,7 @@ const NewHiveAcct: React.FC<NewHiveAcctProps> = () => {
                       placeholder="username"
                     />
                   </Box>
-                  <Button
-                    variantColor="red"
-                    my={4}
-                    type="submit"
-                    isLoading={isSubmitting}
-                  >
+                  <Button my={4} type="submit" isLoading={isSubmitting}>
                     Create Me A Hive Acct!
                   </Button>
                 </Flex>
@@ -198,13 +192,7 @@ const NewHiveAcct: React.FC<NewHiveAcctProps> = () => {
         </Formik>
       ) : (
         <Flex direction="column" p={6} pb={12}>
-          <Text
-            textAlign="center"
-            color="white"
-            fontWeight="bold"
-            fontSize="25px"
-            mb={2}
-          >
+          <Text textAlign="center" fontWeight="bold" fontSize="25px" mb={2}>
             Here Are Your Account Keys
           </Text>
           <Text
@@ -234,7 +222,7 @@ const NewHiveAcct: React.FC<NewHiveAcctProps> = () => {
             >
               Master Password
             </Text>
-            <Text textAlign="center" color="white" mb={2}>
+            <Text textAlign="center" mb={2}>
               {password}
             </Text>
           </Flex>
@@ -244,7 +232,7 @@ const NewHiveAcct: React.FC<NewHiveAcctProps> = () => {
               setSafetyCheck(!safetyCheck);
             }}
           >
-            <Text color="white">
+            <Text>
               I have stored the account password and private keys in a safe
               place.
             </Text>

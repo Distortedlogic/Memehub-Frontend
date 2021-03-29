@@ -21,7 +21,7 @@ const InstallHiveKeychain: React.FC<InstallHiveKeychainProps> = () => {
           </Link>
         </Flex>
         <Flex mb={4} justifyContent="center" alignContent="center">
-          <Text w="60%" textAlign="center" color="white">
+          <Text w="60%" textAlign="center">
             Hive Keychain is a simple user friendly way to manage and use your
             keys hassle free! It is the method recommended and supported by
             Memehub. After installing via the link above, below is a video to

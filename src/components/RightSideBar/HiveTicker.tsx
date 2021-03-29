@@ -46,20 +46,26 @@ export const HiveTicker: React.FC<HiveTickerProps> = () => {
       backgroundColor="black"
       rounded="md"
     >
-      <Link href="https://ionomy.com/en/markets/btc-hive" target="_blank">
+      <Link
+        _hover={{ cursor: "pointer" }}
+        _focus={{}}
+        href="https://bittrex.com/Market/Index?MarketName=USD-HIVE"
+        target="_blank"
+      >
         <Flex direction="column" justifyContent="center" alignItems="center">
-          <Text fontWeight="bold" color="white">
-            Hive
-          </Text>
-          <Text color="white">{hivePrice} USD</Text>
+          <Text fontWeight="bold">Hive</Text>
+          <Text>{hivePrice} USD</Text>
         </Flex>
       </Link>
-      <Link href="https://ionomy.com/en/markets/btc-hbd" target="_blank">
+      <Link
+        _hover={{ cursor: "pointer" }}
+        _focus={{}}
+        href="https://bittrex.com/Market/Index?MarketName=BTC-HBD"
+        target="_blank"
+      >
         <Flex direction="column" justifyContent="center" alignItems="center">
-          <Text fontWeight="bold" color="white">
-            HBD
-          </Text>
-          <Text color="white">{hbdPrice} USD</Text>
+          <Text fontWeight="bold">HBD</Text>
+          <Text>{hbdPrice} USD</Text>
         </Flex>
       </Link>
     </Flex>

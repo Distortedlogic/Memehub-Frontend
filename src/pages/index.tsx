@@ -24,7 +24,7 @@ const index: React.FC<indexProps> = () => {
             alignItems="center"
             px={8}
           >
-            <Text mb={2} textAlign="center" fontSize="xl" fontweight="bold">
+            <Text mb={2} textAlign="center" fontSize="xl" fontWeight="bold">
               So what is Memehub?
             </Text>
             <Text>
@@ -45,7 +45,7 @@ const index: React.FC<indexProps> = () => {
             alignItems="center"
             px={8}
           >
-            <Text mb={2} textAlign="center" fontSize="xl" fontweight="bold">
+            <Text mb={2} textAlign="center" fontSize="xl" fontWeight="bold">
               Meritocratic Cryptos Rewards for the Memers!
             </Text>
             <Text mb={4}>
@@ -84,7 +84,7 @@ const index: React.FC<indexProps> = () => {
             alignItems="center"
             px={8}
           >
-            <Text mb={2} textAlign="center" fontSize="xl" fontweight="bold">
+            <Text mb={2} textAlign="center" fontSize="xl" fontWeight="bold">
               Bringing the Stonk Market to Life!
             </Text>
             <Text>

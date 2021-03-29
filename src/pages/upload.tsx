@@ -9,7 +9,7 @@ import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import InputField from "src/components/utils/InputField";
-import { useMeQuery } from "src/generated/graphql";
+import { useIsAuth } from "src/hooks/isAuth";
 import { useClipboard } from "src/hooks/useClipboard";
 import { useUpload } from "src/hooks/useUpload";
 import { urqlClient } from "src/urql/urqlClient";
@@ -19,7 +19,7 @@ import { SingleColLayout } from "./_singleColLayout";
 interface UploadProps {}
 
 const Upload: React.FC<UploadProps> = () => {
-  const [{ data, error, fetching }] = useMeQuery();
+  const [{ data, error, fetching }] = useIsAuth();
   const toast = useToast();
   const router = useRouter();
   const uploadFN = useUpload();

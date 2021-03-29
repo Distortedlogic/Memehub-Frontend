@@ -131,12 +131,9 @@ export const PostCommentField: React.FC<PostCommentFieldProps> = ({ meme }) => {
         {({ isSubmitting, values, setFieldValue }) => (
           <Form>
             <Flex direction="column">
-              <Flex alignItems="center">
+              <Flex alignItems="center" justifyContent="center">
                 <Button onClick={onToggle} h="5rem" mr={2}>
-                  <Flex direction="column">
-                    <Text>Meme</Text>
-                    <Text>Emojis</Text>
-                  </Flex>
+                  <Text>Emojis</Text>
                 </Button>
                 <InputField
                   textArea
@@ -145,13 +142,7 @@ export const PostCommentField: React.FC<PostCommentFieldProps> = ({ meme }) => {
                   name="text"
                   placeholder="Comment This Meme!"
                 />
-                <Button
-                  h="5rem"
-                  ml={2}
-                  type="submit"
-                  variantColor="blue"
-                  isLoading={isSubmitting}
-                >
+                <Button h="5rem" ml={2} type="submit" isLoading={isSubmitting}>
                   Send
                 </Button>
               </Flex>

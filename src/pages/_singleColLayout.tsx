@@ -1,6 +1,6 @@
 import { Grid, GridItem } from "@chakra-ui/react";
 import React from "react";
-import { LeftSideBar } from "src/components/LeftSideBar";
+import { MiniNavBar } from "src/components/MiniNavBar";
 import { NavBar } from "src/components/NavBar";
 
 interface SingleColLayoutProps {
@@ -9,12 +9,12 @@ interface SingleColLayoutProps {
 
 export const SingleColLayout: React.FC<SingleColLayoutProps> = (props) => {
   return (
-    <Grid h="100%" w="100%" templateRows="10vh 90vh" templateColumns="2fr 9fr">
-      <GridItem borderBottom="1px solid black" rowSpan={1} colSpan={2}>
+    <Grid h="100%" w="100%" templateRows="10vh 10vh 80vh">
+      <GridItem borderBottom="1px solid black">
         <NavBar />
       </GridItem>
-      <GridItem overflow="auto" borderRight="1px solid black">
-        <LeftSideBar />
+      <GridItem borderBottom="1px solid black">
+        <MiniNavBar />
       </GridItem>
       <GridItem overflow="auto">{props.children}</GridItem>
     </Grid>

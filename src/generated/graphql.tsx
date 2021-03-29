@@ -30,11 +30,11 @@ export type Query = {
   newMemes: PaginatedMemes;
   topRatedMemes: PaginatedMemes;
   hotMemes: PaginatedMemes;
-  followingMemes?: Maybe<PaginatedMemes>;
   userRanks: Array<Rank>;
   currentRanks: Array<Rank>;
   ranking: PaginatedRanks;
   bestOfReddit: PaginatedRedditMemes;
+  stonks: PaginatedStonks;
   users: Array<User>;
   me?: Maybe<User>;
   user?: Maybe<User>;
@@ -112,13 +112,6 @@ export type QueryHotMemesArgs = {
 };
 
 
-export type QueryFollowingMemesArgs = {
-  order: Scalars['String'];
-  skip: Scalars['Int'];
-  take: Scalars['Int'];
-};
-
-
 export type QueryUserRanksArgs = {
   timeFrame?: Maybe<Scalars['String']>;
   userId?: Maybe<Scalars['String']>;
@@ -139,6 +132,13 @@ export type QueryRankingArgs = {
 
 
 export type QueryBestOfRedditArgs = {
+  skip: Scalars['Int'];
+  take: Scalars['Int'];
+};
+
+
+export type QueryStonksArgs = {
+  order: Scalars['String'];
   skip: Scalars['Int'];
   take: Scalars['Int'];
 };
@@ -182,6 +182,7 @@ export type User = {
   email: Scalars['String'];
   username: Scalars['String'];
   avatar: Scalars['String'];
+  trades: Array<Trade>;
   memes: Array<Meme>;
   comments: Array<Comment>;
   memeVotes: Array<MemeVote>;
@@ -189,8 +190,6 @@ export type User = {
   rank: Rank;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  numFollowing: Scalars['Int'];
-  numFollowers: Scalars['Int'];
   numMemeVotesGiven: Scalars['Int'];
   numMemeUpvotesRecieved: Scalars['Int'];
   numMemeDownvotesRecieved: Scalars['Int'];
@@ -198,11 +197,21 @@ export type User = {
   numCommentVotesGiven: Scalars['Int'];
   numCommentUpvotesRecieved: Scalars['Int'];
   numCommentDownvotesRecieved: Scalars['Int'];
-  totalPoints: Scalars['Int'];
-  isFollowing: Scalars['Boolean'];
-  followers: Array<User>;
-  following: Array<User>;
+  mhp: Scalars['Int'];
+  gbp: Scalars['Int'];
 };
+
+export type Trade = {
+  __typename?: 'Trade';
+  id: Scalars['String'];
+  name: Scalars['String'];
+  entry: Scalars['Float'];
+  exit: Scalars['Float'];
+  user: User;
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
 
 export type Meme = {
   __typename?: 'Meme';
@@ -239,7 +248,6 @@ export type MemeVote = {
   createdAt: Scalars['DateTime'];
 };
 
-
 export type CommentVote = {
   __typename?: 'CommentVote';
   userId: Scalars['Int'];
@@ -257,7 +265,7 @@ export type Rank = {
   timeFrame: Scalars['String'];
   user: User;
   rank: Scalars['Int'];
-  totalPoints: Scalars['Int'];
+  mhp: Scalars['Int'];
 };
 
 export type Emoji = {
@@ -315,6 +323,20 @@ export type Redditor = {
   username: Scalars['String'];
 };
 
+export type PaginatedStonks = {
+  __typename?: 'PaginatedStonks';
+  items: Array<Stonk>;
+  hasMore: Scalars['Boolean'];
+};
+
+export type Stonk = {
+  __typename?: 'Stonk';
+  name: Scalars['String'];
+  url: Scalars['String'];
+  price: Scalars['Float'];
+  marketcap: Scalars['Int'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   memeClf: Scalars['String'];
@@ -322,8 +344,6 @@ export type Mutation = {
   setCommentIsHive: Scalars['Boolean'];
   upVoteComment: Comment;
   downVoteComment: Comment;
-  follow: Scalars['Boolean'];
-  unfollow: Scalars['Boolean'];
   getSignedUrl: Scalars['String'];
   deleteMeme: Scalars['Boolean'];
   postMeme?: Maybe<Meme>;
@@ -366,16 +386,6 @@ export type MutationUpVoteCommentArgs = {
 
 export type MutationDownVoteCommentArgs = {
   commentId: Scalars['String'];
-};
-
-
-export type MutationFollowArgs = {
-  userId: Scalars['String'];
-};
-
-
-export type MutationUnfollowArgs = {
-  userId: Scalars['String'];
 };
 
 
@@ -479,15 +489,6 @@ export type SubscriptionNewCommentsArgs = {
   userId: Scalars['String'];
 };
 
-export type Follow = {
-  __typename?: 'Follow';
-  followerId: Scalars['String'];
-  follower: User;
-  followingId: Scalars['String'];
-  following: User;
-  createdAt: Scalars['DateTime'];
-};
-
 export type RedditScore = {
   __typename?: 'RedditScore';
   id: Scalars['Int'];
@@ -510,17 +511,17 @@ export type RedditScore = {
 export type Market = {
   __typename?: 'Market';
   name: Scalars['String'];
-  numPosts: Scalars['Int'];
-  totalUpvotes: Scalars['Int'];
-  upvotesPerPost: Scalars['Int'];
-};
-
-export type StonkMarket = {
-  __typename?: 'StonkMarket';
   createdAt: Scalars['DateTime'];
   source: Scalars['String'];
   subsource: Scalars['String'];
-  market: Array<Market>;
+  numPosts: Scalars['Int'];
+  numUpvotes: Scalars['Int'];
+};
+
+export type Template = {
+  __typename?: 'Template';
+  name: Scalars['String'];
+  url: Scalars['String'];
 };
 
 export type RedditMaxTimestampQueryVariables = Exact<{ [key: string]: never; }>;
@@ -557,6 +558,10 @@ export type MemeClfMutation = (
 export type MyCommentFragment = (
   { __typename?: 'Comment' }
   & Pick<Comment, 'id' | 'ups' | 'downs' | 'ratio' | 'createdAt' | 'text' | 'isHive' | 'permlink'>
+  & { meme: (
+    { __typename?: 'Meme' }
+    & Pick<Meme, 'url' | 'id'>
+  ) }
 );
 
 export type CommentFragment = (
@@ -713,26 +718,6 @@ export type EmojisQuery = (
   )> }
 );
 
-export type FollowMutationVariables = Exact<{
-  userId: Scalars['String'];
-}>;
-
-
-export type FollowMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'follow'>
-);
-
-export type UnfollowMutationVariables = Exact<{
-  userId: Scalars['String'];
-}>;
-
-
-export type UnfollowMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'unfollow'>
-);
-
 export type MyMemeFragment = (
   { __typename?: 'Meme' }
   & Pick<Meme, 'id' | 'ups' | 'downs' | 'ratio' | 'createdAt' | 'title' | 'url' | 'numComments' | 'isHive'>
@@ -748,7 +733,6 @@ export type UserMemeFragment = (
   { __typename?: 'Meme' }
   & { user: (
     { __typename?: 'User' }
-    & Pick<User, 'isFollowing'>
     & UserFragment
   ) }
   & MemeFragment
@@ -877,25 +861,6 @@ export type UserMemesQuery = (
   )> }
 );
 
-export type FollowingMemesQueryVariables = Exact<{
-  take: Scalars['Int'];
-  skip: Scalars['Int'];
-  order: Scalars['String'];
-}>;
-
-
-export type FollowingMemesQuery = (
-  { __typename?: 'Query' }
-  & { followingMemes?: Maybe<(
-    { __typename?: 'PaginatedMemes' }
-    & Pick<PaginatedMemes, 'hasMore'>
-    & { items: Array<(
-      { __typename?: 'Meme' }
-      & UserMemeFragment
-    )> }
-  )> }
-);
-
 export type NewMemesQueryVariables = Exact<{
   take: Scalars['Int'];
   cursor?: Maybe<Scalars['String']>;
@@ -953,7 +918,7 @@ export type TopRatedMemesQuery = (
 
 export type RankFragment = (
   { __typename?: 'Rank' }
-  & Pick<Rank, 'totalPoints' | 'rank' | 'timeFrame' | 'createdAt'>
+  & Pick<Rank, 'mhp' | 'rank' | 'timeFrame' | 'createdAt'>
 );
 
 export type UserRankFragment = (
@@ -1049,25 +1014,47 @@ export type RedisGetMutation = (
   & Pick<Mutation, 'redisGet'>
 );
 
+export type TemplateFragment = (
+  { __typename?: 'Template' }
+  & Pick<Template, 'name' | 'url'>
+);
+
+export type StonkFragment = (
+  { __typename?: 'Stonk' }
+  & Pick<Stonk, 'name' | 'url' | 'price' | 'marketcap'>
+);
+
+export type StonksQueryVariables = Exact<{
+  take: Scalars['Int'];
+  skip: Scalars['Int'];
+  order: Scalars['String'];
+}>;
+
+
+export type StonksQuery = (
+  { __typename?: 'Query' }
+  & { stonks: (
+    { __typename?: 'PaginatedStonks' }
+    & Pick<PaginatedStonks, 'hasMore'>
+    & { items: Array<(
+      { __typename?: 'Stonk' }
+      & StonkFragment
+    )> }
+  ) }
+);
+
 export type UserFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'avatar' | 'username' | 'isHive' | 'totalPoints'>
+  & Pick<User, 'id' | 'avatar' | 'username' | 'isHive' | 'mhp' | 'gbp'>
 );
 
 export type StatsFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'numMemeVotesGiven' | 'numMemeUpvotesRecieved' | 'numMemeDownvotesRecieved' | 'numMemeCommentsRecieved' | 'numCommentVotesGiven' | 'numCommentUpvotesRecieved' | 'numCommentDownvotesRecieved' | 'numFollowing' | 'numFollowers'>
+  & Pick<User, 'numMemeVotesGiven' | 'numMemeUpvotesRecieved' | 'numMemeDownvotesRecieved' | 'numMemeCommentsRecieved' | 'numCommentVotesGiven' | 'numCommentUpvotesRecieved' | 'numCommentDownvotesRecieved'>
 );
 
 export type UserProfileFragment = (
   { __typename?: 'User' }
-  & { following: Array<(
-    { __typename?: 'User' }
-    & UserFragment
-  )>, followers: Array<(
-    { __typename?: 'User' }
-    & UserFragment
-  )> }
   & UserFragment
   & StatsFragment
 );
@@ -1249,6 +1236,10 @@ export const MyCommentFragmentDoc = gql`
   text
   isHive
   permlink
+  meme {
+    url
+    id
+  }
 }
     `;
 export const CommentFragmentDoc = gql`
@@ -1264,7 +1255,8 @@ export const UserFragmentDoc = gql`
   avatar
   username
   isHive
-  totalPoints
+  mhp
+  gbp
 }
     `;
 export const UserCommentFragmentDoc = gql`
@@ -1307,14 +1299,13 @@ export const UserMemeFragmentDoc = gql`
   ...meme
   user {
     ...user
-    isFollowing
   }
 }
     ${MemeFragmentDoc}
 ${UserFragmentDoc}`;
 export const RankFragmentDoc = gql`
     fragment rank on Rank {
-  totalPoints
+  mhp
   rank
   timeFrame
   createdAt
@@ -1344,6 +1335,20 @@ export const RedditMemeFragmentDoc = gql`
   }
 }
     `;
+export const TemplateFragmentDoc = gql`
+    fragment template on Template {
+  name
+  url
+}
+    `;
+export const StonkFragmentDoc = gql`
+    fragment stonk on Stonk {
+  name
+  url
+  price
+  marketcap
+}
+    `;
 export const StatsFragmentDoc = gql`
     fragment stats on User {
   numMemeVotesGiven
@@ -1353,20 +1358,12 @@ export const StatsFragmentDoc = gql`
   numCommentVotesGiven
   numCommentUpvotesRecieved
   numCommentDownvotesRecieved
-  numFollowing
-  numFollowers
 }
     `;
 export const UserProfileFragmentDoc = gql`
     fragment userProfile on User {
   ...user
   ...stats
-  following {
-    ...user
-  }
-  followers {
-    ...user
-  }
 }
     ${UserFragmentDoc}
 ${StatsFragmentDoc}`;
@@ -1525,24 +1522,6 @@ export const EmojisDocument = gql`
 export function useEmojisQuery(options: Omit<Urql.UseQueryArgs<EmojisQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<EmojisQuery>({ query: EmojisDocument, ...options });
 };
-export const FollowDocument = gql`
-    mutation Follow($userId: String!) {
-  follow(userId: $userId)
-}
-    `;
-
-export function useFollowMutation() {
-  return Urql.useMutation<FollowMutation, FollowMutationVariables>(FollowDocument);
-};
-export const UnfollowDocument = gql`
-    mutation Unfollow($userId: String!) {
-  unfollow(userId: $userId)
-}
-    `;
-
-export function useUnfollowMutation() {
-  return Urql.useMutation<UnfollowMutation, UnfollowMutationVariables>(UnfollowDocument);
-};
 export const PostMemeDocument = gql`
     mutation PostMeme($title: String!, $postToHive: Boolean!) {
   postMeme(title: $title, postToHive: $postToHive) {
@@ -1641,20 +1620,6 @@ export const UserMemesDocument = gql`
 
 export function useUserMemesQuery(options: Omit<Urql.UseQueryArgs<UserMemesQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<UserMemesQuery>({ query: UserMemesDocument, ...options });
-};
-export const FollowingMemesDocument = gql`
-    query FollowingMemes($take: Int!, $skip: Int!, $order: String!) {
-  followingMemes(take: $take, skip: $skip, order: $order) {
-    items {
-      ...userMeme
-    }
-    hasMore
-  }
-}
-    ${UserMemeFragmentDoc}`;
-
-export function useFollowingMemesQuery(options: Omit<Urql.UseQueryArgs<FollowingMemesQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<FollowingMemesQuery>({ query: FollowingMemesDocument, ...options });
 };
 export const NewMemesDocument = gql`
     query NewMemes($take: Int!, $cursor: String) {
@@ -1756,6 +1721,20 @@ export const RedisGetDocument = gql`
 
 export function useRedisGetMutation() {
   return Urql.useMutation<RedisGetMutation, RedisGetMutationVariables>(RedisGetDocument);
+};
+export const StonksDocument = gql`
+    query Stonks($take: Int!, $skip: Int!, $order: String!) {
+  stonks(take: $take, skip: $skip, order: $order) {
+    items {
+      ...stonk
+    }
+    hasMore
+  }
+}
+    ${StonkFragmentDoc}`;
+
+export function useStonksQuery(options: Omit<Urql.UseQueryArgs<StonksQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<StonksQuery>({ query: StonksDocument, ...options });
 };
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($token: String!, $newPassword: String!) {

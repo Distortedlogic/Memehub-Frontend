@@ -35,7 +35,7 @@ export const ScrollToTop: React.FC<ScrollToTopProps> = () => {
       opacity={0.8}
     >
       <Flex p={2} rounded="md" backgroundColor="black">
-        <Text color="white">Back To Top</Text>
+        <Text>Back To Top</Text>
       </Flex>
     </Box>
   ) : null;

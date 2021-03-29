@@ -1,4 +1,4 @@
-import { Image } from "@chakra-ui/core";
+import { Image } from "@chakra-ui/image";
 import React from "react";
 import { EmojiFragment } from "../generated/graphql";
 

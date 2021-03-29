@@ -29,13 +29,7 @@ const InputField: React.FC<InputFieldProps> = ({
       {textArea ? (
         <Textarea {...field} {...props} id={field.name} />
       ) : (
-        <Input
-          borderColor="gray"
-          {...field}
-          {...props}
-          id={field.name}
-          textColor="white"
-        />
+        <Input borderColor="gray" {...field} {...props} id={field.name} />
       )}
       {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
     </FormControl>

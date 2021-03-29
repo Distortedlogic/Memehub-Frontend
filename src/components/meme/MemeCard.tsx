@@ -17,7 +17,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import ellipsize from "ellipsize";
 import { Form, Formik } from "formik";
 import Humanize from "humanize-plus";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { AvatarLink } from "src/components/utils/AvatarLink";
@@ -32,19 +31,24 @@ import {
 import { ratioToColorGrade } from "src/utils/functions";
 dayjs.extend(relativeTime);
 
-interface MemeProps extends BoxProps {
+interface MemeCardProps extends BoxProps {
   topfull: boolean;
   meme: MemeFragment;
   user: UserFragment;
 }
 
-export const MemeBox: React.FC<MemeProps> = (props) => {
+export const MemeCard: React.FC<MemeCardProps> = (props) => {
   let { meme, user, topfull } = props;
   const router = useRouter();
 
   return (
-    <Box {...props} p={6} rounded="md" backgroundColor="black">
-      <TopBar meme={meme} user={user} topfull={topfull} />
+    <Flex
+      {...props}
+      justifyContent="space-between"
+      alignItems="center"
+      p={4}
+      rounded="md"
+    >
       <Flex
         _hover={{ cursor: "pointer" }}
         onClick={() => {
@@ -52,12 +56,13 @@ export const MemeBox: React.FC<MemeProps> = (props) => {
         }}
         justifyContent="center"
         alignItems="center"
-        p={2}
       >
-        <Image rounded="md" w="auto" src={meme.url} />
+        <Image rounded="md" w="150px" src={meme.url} />
       </Flex>
+      <TopBar meme={meme} user={user} topfull={topfull} />
+
       <BottomBar user={user} meme={meme} />
-    </Box>
+    </Flex>
   );
 };
 
@@ -86,9 +91,9 @@ export const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
   ) : null;
   const topBar = (
     <Flex justifyContent="center" alignItems="center">
-      <AvatarLink userId={user.id} size="md" src={user.avatar} />
+      <AvatarLink userId={user.id} size="sm" src={user.avatar} />
       <Box ml={2}>
-        <Text fontSize="md" fontWeight="bold" mx={2}>
+        <Text fontSize="md" mx={2}>
           {user.username}
         </Text>
         <Flex>
@@ -101,8 +106,8 @@ export const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
 
   if (topfull) {
     return (
-      <Flex direction="column">
-        <Flex mb={4} justifyContent="space-between">
+      <Flex w="100%" direction="column" px={4}>
+        <Flex mb={4} justifyContent="start" alignItems="center">
           {topBar}
           <Text fontSize="sm" mx={2}>
             {dayjs(meme.createdAt).fromNow()}
@@ -134,6 +139,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
   const { grade, color } = ratioToColorGrade(meme.ratio);
   const [{ data, error, fetching }] = useMeQuery();
   const { isOpen, onToggle } = useDisclosure();
+  const router = useRouter();
   const toast = useToast();
   const [{ fetching: upFetching }, upVoteMemeFN] = useUpVoteMemeMutation();
   const [
@@ -223,36 +229,42 @@ export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
   };
   return (
     <>
-      <Flex mt={2} justifyContent="center" align="center">
-        <VoteButton
-          downvote
-          size="sm"
-          numVotes={meme.downs}
-          fetching={downFetching}
-          handleVote={handleDownvote}
-          hasVoted={meme.hasDownvoted}
-        />
-        <NextLink href="/meme/[memeId]" as={`/meme/${meme.id}`}>
-          <Button size="sm" m={1}>
+      <Flex justifyContent="center" align="center">
+        <Flex direction="column">
+          <Button
+            size="sm"
+            m={1}
+            onClick={() => router.push(`/meme/${meme.id}`)}
+          >
             <FontAwesomeIcon icon="comment-alt" size="lg" />
             <Text fontSize="15px" fontWeight="bold" ml={2}>
               {Humanize.compactInteger(meme.numComments, 1)}
             </Text>
           </Button>
-        </NextLink>
-        <Flex mr={2} justifyContent="center" alignItems="center">
-          <Text color={color} ml={2} fontSize="30px" fontWeight="bold">
-            {grade}
-          </Text>
+          <Flex mr={2} justifyContent="center" alignItems="center">
+            <Text color={color} ml={2} fontSize="30px" fontWeight="bold">
+              {grade}
+            </Text>
+          </Flex>
         </Flex>
-        <VoteButton
-          upvote
-          size="sm"
-          numVotes={meme.ups}
-          fetching={upFetching}
-          handleVote={handleUpvote}
-          hasVoted={meme.hasUpvoted}
-        />
+        <Flex direction="column">
+          <VoteButton
+            upvote
+            size="sm"
+            numVotes={meme.ups}
+            fetching={upFetching}
+            handleVote={handleUpvote}
+            hasVoted={meme.hasUpvoted}
+          />
+          <VoteButton
+            downvote
+            size="sm"
+            numVotes={meme.downs}
+            fetching={downFetching}
+            handleVote={handleDownvote}
+            hasVoted={meme.hasDownvoted}
+          />
+        </Flex>
       </Flex>
       <Collapse in={isOpen}>
         <Formik

@@ -1,4 +1,4 @@
-import { Stack } from "@chakra-ui/layout";
+import { Divider, Stack } from "@chakra-ui/layout";
 import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { CommentBox } from "src/components/comments/CommentBox";
@@ -42,11 +42,14 @@ export const Comments: React.FC<CommentsProps> = ({ memeId, order }) => {
     >
       <Stack>
         {comments.map((comment) => (
-          <CommentBox
-            key={comment.id}
-            comment={comment}
-            emojis={emojiData.emojis}
-          />
+          <>
+            <CommentBox
+              key={comment.id}
+              comment={comment}
+              emojis={emojiData.emojis}
+            />
+            <Divider />
+          </>
         ))}
       </Stack>
     </InfiniteScroll>

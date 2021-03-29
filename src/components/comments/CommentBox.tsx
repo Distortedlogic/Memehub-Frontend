@@ -20,6 +20,7 @@ import {
   useDownVoteCommentMutation,
   useMeQuery,
   UserCommentFragment,
+  UserFragment,
   useUpVoteCommentMutation,
 } from "src/generated/graphql";
 import { getHash, ratioToColorGrade } from "src/utils/functions";
@@ -84,11 +85,15 @@ export const CommentBox: React.FC<CommentBoxProps> = ({ comment, emojis }) => {
   return (
     <Flex direction="column" backgroundColor="black" p={2} mb={2} rounded="md">
       <Flex align="center" justifyContent="space-between">
-        <LeftSide comment={comment} />
-        <Text p={4} color="white" fontSize="18px" w="60%">
+        <CommentLeftSide createdAt={comment.createdAt} user={comment.user} />
+        <Text p={4} fontSize="18px" w="60%">
           {insertEmojis(comment.text, emojis)}
         </Text>
-        <RightSide isOpen={isOpen} onToggle={onToggle} comment={comment} />
+        <CommentRightSide
+          isOpen={isOpen}
+          onToggle={onToggle}
+          comment={comment}
+        />
       </Flex>
       <Collapse in={isOpen}>
         <Formik
@@ -120,12 +125,7 @@ export const CommentBox: React.FC<CommentBoxProps> = ({ comment, emojis }) => {
                     {voteWieght}
                   </Button>
                 </Flex>
-                <Button
-                  mt={2}
-                  type="submit"
-                  variantColor="blue"
-                  isLoading={isSubmitting}
-                >
+                <Button mt={2} type="submit" isLoading={isSubmitting}>
                   Vote
                 </Button>
               </Flex>
@@ -137,39 +137,35 @@ export const CommentBox: React.FC<CommentBoxProps> = ({ comment, emojis }) => {
   );
 };
 
-interface LeftSideProps {
-  comment: UserCommentFragment;
+interface CommentLeftSideProps {
+  createdAt: string;
+  user: UserFragment;
 }
 
-export const LeftSide: React.FC<LeftSideProps> = ({ comment }) => {
+export const CommentLeftSide: React.FC<CommentLeftSideProps> = ({
+  createdAt,
+  user,
+}) => {
   return (
     <Flex alignSelf="start" w="30%">
-      <Box m={2}>
-        <AvatarLink
-          userId={comment.user.id}
-          size="50px"
-          src={comment.user.avatar}
-        />
-      </Box>
+      <AvatarLink m={2} userId={user.id} size="sm" src={user.avatar} />
       <Flex direction="column" justifyContent="center">
-        <Text color="white" fontSize="md" fontWeight="bold">
-          {comment.user.username}
+        <Text fontSize="md" fontWeight="bold">
+          {user.username}
         </Text>
-        <Text color="white" fontSize="sm">
-          {dayjs(comment.createdAt).fromNow()}
-        </Text>
+        <Text fontSize="sm">{dayjs(createdAt).fromNow()}</Text>
       </Flex>
     </Flex>
   );
 };
 
-interface RightSideProps {
+interface CommentRightSideProps {
   comment: UserCommentFragment;
   onToggle: () => void;
   isOpen: boolean;
 }
 
-export const RightSide: React.FC<RightSideProps> = ({
+export const CommentRightSide: React.FC<CommentRightSideProps> = ({
   comment,
   onToggle,
   isOpen,
