@@ -157,7 +157,13 @@ const NewHiveAcct: React.FC<NewHiveAcctProps> = () => {
         >
           {({ isSubmitting, setErrors, setFieldValue }) => (
             <Form>
-              <Flex py={6} w="100%" direction="column" alignItems="center">
+              <Flex
+                h="80vh"
+                py={6}
+                w="100%"
+                direction="column"
+                alignItems="center"
+              >
                 <Flex direction="column" justifyContent="center" w="60%">
                   <Text
                     textAlign="center"

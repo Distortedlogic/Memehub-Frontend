@@ -7,7 +7,7 @@ export const useIsAuth = () => {
   const router = useRouter();
   useEffect(() => {
     if (!error && !fetching && !data?.me) {
-      router.replace("/onboarding/memehub?startMode=login");
+      router.replace("/onboarding/memehub/login");
     }
   }, [fetching, data, router]);
   return [{ data, error, fetching }];

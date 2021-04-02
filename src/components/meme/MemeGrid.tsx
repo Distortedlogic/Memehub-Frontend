@@ -1,5 +1,5 @@
 import { Box, Divider, Flex, Grid } from "@chakra-ui/layout";
-import React from "react";
+import React, { Fragment } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { endMessage } from "src/components/utils/endMessage";
 import { loader } from "src/components/utils/loader";
@@ -32,16 +32,15 @@ export const MemeGrid: React.FC<MemeGridProps> = ({
 
   const MemeDisplay = gridView === "list" ? MemeCard : MemeBox;
   const memeComponents = pagedMemes.map((meme) => (
-    <>
+    <Fragment key={meme.id}>
       <MemeDisplay
         mb={2}
-        key={meme.id}
         topfull={user ? false : true}
         meme={meme}
         user={user ? user : (meme as UserMemeFragment).user}
       />
       <Divider />
-    </>
+    </Fragment>
   ));
   const grid =
     gridView === "grid" ? (
@@ -66,7 +65,7 @@ export const MemeGrid: React.FC<MemeGridProps> = ({
 
   return (
     <InfiniteScroll
-      dataLength={pagedMemes.length}
+      dataLength={memeComponents.length}
       next={loadMore}
       hasMore={hasMore}
       loader={loader}

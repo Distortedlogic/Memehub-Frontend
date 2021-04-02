@@ -101,10 +101,12 @@ const Wallet: React.FC<WalletProps> = () => {
     </Flex>
   ) : (
     <Flex direction="column">
-      <Text mt={4} textAlign="center" fontWeight="bold">
-        You need a Hive acct to earn cryptocurrency on Memehub
+      <Text mt={8} mb={4} textAlign="center" fontWeight="bold">
+        Want to earn crypto for your dank memes on Memehub?
       </Text>
-
+      <Text mt={4} mb={4} textAlign="center" fontWeight="bold">
+        Get your Hive Blockchain Account!
+      </Text>
       <Button mt={4} p={0}>
         <Link
           as={Flex}
@@ -129,7 +131,7 @@ const Wallet: React.FC<WalletProps> = () => {
 
   return (
     <DoubleColLayout>
-      <Flex direction="column" p={6}>
+      <Flex direction="column" h="80vh" p={6}>
         <Flex px={6} py={2} justifyContent="space-between" alignItems="center">
           <Flex direction="column">
             <Text fontWeight="bold">Memehub Points (MHP)</Text>

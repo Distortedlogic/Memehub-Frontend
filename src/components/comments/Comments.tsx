@@ -1,5 +1,5 @@
 import { Divider, Stack } from "@chakra-ui/layout";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { CommentBox } from "src/components/comments/CommentBox";
 import { useCommentsQuery, useEmojisQuery } from "src/generated/graphql";
@@ -42,14 +42,10 @@ export const Comments: React.FC<CommentsProps> = ({ memeId, order }) => {
     >
       <Stack>
         {comments.map((comment) => (
-          <>
-            <CommentBox
-              key={comment.id}
-              comment={comment}
-              emojis={emojiData.emojis}
-            />
+          <Fragment key={comment.id}>
+            <CommentBox comment={comment} emojis={emojiData.emojis} />
             <Divider />
-          </>
+          </Fragment>
         ))}
       </Stack>
     </InfiniteScroll>

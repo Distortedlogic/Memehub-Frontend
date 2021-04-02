@@ -22,15 +22,15 @@ export const TopRated: React.FC<TopRatedProps> = ({ days }) => {
     settings: { gridView },
   } = useStoreState((state) => state);
   if (error) console.log("error", error);
-  if (!data || fetching) {
+  if (!data || fetching || !data.topRatedMemes) {
     return (
       <SingleColLayout>
         <Text>Loading ...</Text>
       </SingleColLayout>
     );
   } else {
-    const { hasMore, items: memes } = data!.topRatedMemes;
-    if (gridView == "mosaic") {
+    const { hasMore, items: memes } = data.topRatedMemes;
+    if (gridView == "grid") {
       return (
         <SingleColLayout>
           <MemeGrid pagedMemes={memes} hasMore={hasMore} loadMore={loadMore} />

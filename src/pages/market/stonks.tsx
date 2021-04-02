@@ -2,15 +2,15 @@ import { withUrqlClient } from "next-urql";
 import React from "react";
 import { StonkGrid } from "src/components/stonk/StonkGrid";
 import { urqlClient } from "src/urql/urqlClient";
-import { DoubleColLayout } from "../_doubleColLayout";
+import { MarketLayout } from "./_marketLayout";
 
 interface StonksProps {}
 
 const Stonks: React.FC<StonksProps> = () => {
   return (
-    <DoubleColLayout>
+    <MarketLayout>
       <StonkGrid />
-    </DoubleColLayout>
+    </MarketLayout>
   );
 };
 export default withUrqlClient(urqlClient)(Stonks);

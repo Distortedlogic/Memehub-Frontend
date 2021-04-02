@@ -17,7 +17,6 @@ import React from "react";
 import { AvatarLink } from "src/components/utils/AvatarLink";
 import {
   EmojiFragment,
-  useDownVoteCommentMutation,
   useMeQuery,
   UserCommentFragment,
   UserFragment,
@@ -25,7 +24,8 @@ import {
 } from "src/generated/graphql";
 import { getHash, ratioToColorGrade } from "src/utils/functions";
 import { insertEmojis } from "src/utils/insertEmojis";
-import { VoteButton } from "../utils/VoteButton";
+import { DownvoteButton } from "./DownvoteButton";
+import { UpvoteButton } from "./UpvoteButton";
 dayjs.extend(relativeTime);
 
 interface CommentBoxProps {
@@ -34,7 +34,7 @@ interface CommentBoxProps {
 }
 
 export const CommentBox: React.FC<CommentBoxProps> = ({ comment, emojis }) => {
-  const { isOpen, onToggle } = useDisclosure();
+  const { isOpen, onToggle: toggleHiveVote } = useDisclosure();
   const [{ fetching, data, error }] = useMeQuery();
   const [, upVoteCommentFN] = useUpVoteCommentMutation();
   const toast = useToast();
@@ -70,7 +70,7 @@ export const CommentBox: React.FC<CommentBoxProps> = ({ comment, emojis }) => {
             isClosable: true,
             status: "success",
           });
-          onToggle();
+          toggleHiveVote();
         } else {
           toast({
             description: "Ooh no, upvoting on Hive didnt work!",
@@ -91,7 +91,7 @@ export const CommentBox: React.FC<CommentBoxProps> = ({ comment, emojis }) => {
         </Text>
         <CommentRightSide
           isOpen={isOpen}
-          onToggle={onToggle}
+          toggleHiveVote={toggleHiveVote}
           comment={comment}
         />
       </Flex>
@@ -161,67 +161,16 @@ export const CommentLeftSide: React.FC<CommentLeftSideProps> = ({
 
 interface CommentRightSideProps {
   comment: UserCommentFragment;
-  onToggle: () => void;
+  toggleHiveVote: () => void;
   isOpen: boolean;
 }
 
 export const CommentRightSide: React.FC<CommentRightSideProps> = ({
   comment,
-  onToggle,
+  toggleHiveVote,
   isOpen,
 }) => {
-  const [{ fetching, data, error }] = useMeQuery();
-  const [
-    { fetching: upFetching },
-    upVoteCommentFN,
-  ] = useUpVoteCommentMutation();
-  const [
-    { fetching: downFetching },
-    downVoteCommentFN,
-  ] = useDownVoteCommentMutation();
-  const toast = useToast();
-  if (error) console.log(error);
-  if (fetching || !data) {
-    return <></>;
-  }
-  const { me } = data;
-  const hasVoted = () => {
-    if (comment.hasUpvoted || comment.hasDownvoted) {
-      toast({
-        title: "Oops",
-        description: "You already voted this comment",
-        status: "warning",
-        duration: 3000,
-        isClosable: true,
-      });
-      return true;
-    } else {
-      return false;
-    }
-  };
-  const handleUpvote = async () => {
-    if (!hasVoted()) {
-      if (me?.isHive && comment.isHive) {
-        onToggle();
-      } else {
-        const { data, error } = await upVoteCommentFN({
-          commentId: comment.id,
-        });
-        if (error) console.log("errror", error);
-        if (data?.upVoteComment) {
-          comment = data?.upVoteComment;
-        }
-      }
-    }
-  };
-  const handleDownvote = async () => {
-    if (!hasVoted()) {
-      const { data } = await downVoteCommentFN({ commentId: comment.id });
-      if (data?.downVoteComment) comment = data?.downVoteComment;
-    }
-  };
   const { grade, color } = ratioToColorGrade(comment.ratio);
-
   return (
     <>
       <Flex
@@ -230,27 +179,18 @@ export const CommentRightSide: React.FC<CommentRightSideProps> = ({
         align="center"
         alignSelf="end"
       >
-        <VoteButton
-          upvote
-          numVotes={comment.ups}
-          hasVoted={comment.hasUpvoted}
-          handleVote={handleUpvote}
-          fetching={upFetching || isOpen}
+        <UpvoteButton
+          isOpen={isOpen}
+          toggleHiveVote={toggleHiveVote}
           size="md"
+          comment={comment}
         />
         <Flex justifyContent="space-around">
           <Text color={color} fontSize="15px" fontWeight="bold" m={1}>
             {grade}
           </Text>
         </Flex>
-        <VoteButton
-          downvote
-          numVotes={comment.downs}
-          hasVoted={comment.hasDownvoted}
-          handleVote={handleDownvote}
-          fetching={downFetching}
-          size="md"
-        />
+        <DownvoteButton isOpen={isOpen} size="md" comment={comment} />
       </Flex>
     </>
   );

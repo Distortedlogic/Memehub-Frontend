@@ -112,16 +112,12 @@ interface MemesProps {
 const Memes: React.FC<MemesProps> = ({ user, order }) => {
   const [skip, setSkip] = useState(0);
   const [{ data, error, fetching }] = useUserMemesQuery({
-    variables: { userId: user.id, order, skip, take: 16 },
+    variables: { userId: user.id, order, skip, take },
   });
   const loadMore = () => setSkip(skip + take);
   if (error) console.log("error", error);
   if (!data || fetching || !data.userMemes) {
-    return (
-      <DoubleColLayout>
-        <Text>Loading ...</Text>
-      </DoubleColLayout>
-    );
+    return <></>;
   }
   const { hasMore, items: memes } = data.userMemes;
   return (
