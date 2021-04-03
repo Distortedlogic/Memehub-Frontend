@@ -35,6 +35,8 @@ export type Query = {
   ranking: PaginatedRanks;
   bestOfReddit: PaginatedRedditMemes;
   stonks: PaginatedStonks;
+  positions: PaginatedPositions;
+  history: PaginatedTrades;
   users: Array<User>;
   me?: Maybe<User>;
   user?: Maybe<User>;
@@ -139,6 +141,21 @@ export type QueryBestOfRedditArgs = {
 
 export type QueryStonksArgs = {
   order: Scalars['String'];
+  onlyPositions: Scalars['Boolean'];
+  skip: Scalars['Int'];
+  take: Scalars['Int'];
+};
+
+
+export type QueryPositionsArgs = {
+  userId: Scalars['String'];
+  skip: Scalars['Int'];
+  take: Scalars['Int'];
+};
+
+
+export type QueryHistoryArgs = {
+  userId: Scalars['String'];
   skip: Scalars['Int'];
   take: Scalars['Int'];
 };
@@ -205,11 +222,33 @@ export type Trade = {
   __typename?: 'Trade';
   id: Scalars['String'];
   name: Scalars['String'];
-  entry: Scalars['Float'];
-  exit: Scalars['Float'];
+  type: Scalars['String'];
+  price: Scalars['Int'];
+  position: Scalars['Int'];
+  template: Template;
+  userId: Scalars['String'];
   user: User;
   createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+  currentPrice: Scalars['Int'];
+};
+
+export type Template = {
+  __typename?: 'Template';
+  id: Scalars['String'];
+  name: Scalars['String'];
+  url: Scalars['String'];
+  marketData: Array<Market>;
+  trades: Array<Trade>;
+};
+
+export type Market = {
+  __typename?: 'Market';
+  id: Scalars['String'];
+  name: Scalars['String'];
+  templateId: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  numPosts: Scalars['Int'];
+  numUpvotes: Scalars['Int'];
 };
 
 
@@ -306,6 +345,8 @@ export type RedditMeme = {
   memeClfCorrect: Scalars['Boolean'];
   stonk: Scalars['Boolean'];
   stonkCorrect: Scalars['Boolean'];
+  stonkOfficial: Scalars['String'];
+  isATemplateOfficial: Scalars['Boolean'];
   version: Scalars['String'];
   timestamp: Scalars['Int'];
   createdAt: Scalars['DateTime'];
@@ -331,10 +372,35 @@ export type PaginatedStonks = {
 
 export type Stonk = {
   __typename?: 'Stonk';
+  id: Scalars['String'];
   name: Scalars['String'];
   url: Scalars['String'];
+  marketData: Array<Market>;
+  trades: Array<Trade>;
   price: Scalars['Float'];
   marketcap: Scalars['Int'];
+  numPosts: Scalars['Int'];
+  position: Scalars['Int'];
+};
+
+export type PaginatedPositions = {
+  __typename?: 'PaginatedPositions';
+  items: Array<Position>;
+  hasMore: Scalars['Boolean'];
+};
+
+export type Position = {
+  __typename?: 'Position';
+  name: Scalars['String'];
+  price: Scalars['Int'];
+  position: Scalars['Int'];
+  currentPrice: Scalars['Int'];
+};
+
+export type PaginatedTrades = {
+  __typename?: 'PaginatedTrades';
+  items: Array<Trade>;
+  hasMore: Scalars['Boolean'];
 };
 
 export type Mutation = {
@@ -351,6 +417,7 @@ export type Mutation = {
   upVoteMeme: Meme;
   downVoteMeme: Meme;
   redisGet: Scalars['String'];
+  makeTrade: Trade;
   hiveLogin: UserResponse;
   login?: Maybe<UserResponse>;
   logout: Scalars['Boolean'];
@@ -423,6 +490,13 @@ export type MutationDownVoteMemeArgs = {
 
 export type MutationRedisGetArgs = {
   key: Scalars['String'];
+};
+
+
+export type MutationMakeTradeArgs = {
+  position: Scalars['Int'];
+  type: Scalars['String'];
+  name: Scalars['String'];
 };
 
 
@@ -506,22 +580,6 @@ export type RedditScore = {
   huScore: Scalars['Float'];
   lowestRatio: Scalars['Float'];
   redditorId: Scalars['Int'];
-};
-
-export type Market = {
-  __typename?: 'Market';
-  name: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  source: Scalars['String'];
-  subsource: Scalars['String'];
-  numPosts: Scalars['Int'];
-  numUpvotes: Scalars['Int'];
-};
-
-export type Template = {
-  __typename?: 'Template';
-  name: Scalars['String'];
-  url: Scalars['String'];
 };
 
 export type RedditMaxTimestampQueryVariables = Exact<{ [key: string]: never; }>;
@@ -1021,12 +1079,13 @@ export type TemplateFragment = (
 
 export type StonkFragment = (
   { __typename?: 'Stonk' }
-  & Pick<Stonk, 'name' | 'url' | 'price' | 'marketcap'>
+  & Pick<Stonk, 'name' | 'url' | 'price' | 'marketcap' | 'numPosts' | 'position'>
 );
 
 export type StonksQueryVariables = Exact<{
   take: Scalars['Int'];
   skip: Scalars['Int'];
+  onlyPositions: Scalars['Boolean'];
   order: Scalars['String'];
 }>;
 
@@ -1040,6 +1099,79 @@ export type StonksQuery = (
       { __typename?: 'Stonk' }
       & StonkFragment
     )> }
+  ) }
+);
+
+export type PositionFragment = (
+  { __typename?: 'Position' }
+  & Pick<Position, 'name' | 'price' | 'position' | 'currentPrice'>
+);
+
+export type PagedPositionsFragment = (
+  { __typename?: 'PaginatedPositions' }
+  & Pick<PaginatedPositions, 'hasMore'>
+  & { items: Array<(
+    { __typename?: 'Position' }
+    & PositionFragment
+  )> }
+);
+
+export type PositionsQueryVariables = Exact<{
+  take: Scalars['Int'];
+  skip: Scalars['Int'];
+  userId: Scalars['String'];
+}>;
+
+
+export type PositionsQuery = (
+  { __typename?: 'Query' }
+  & { positions: (
+    { __typename?: 'PaginatedPositions' }
+    & PagedPositionsFragment
+  ) }
+);
+
+export type TradeFragment = (
+  { __typename?: 'Trade' }
+  & Pick<Trade, 'id' | 'name' | 'type' | 'price' | 'position' | 'createdAt' | 'currentPrice'>
+);
+
+export type PagedTradesFragment = (
+  { __typename?: 'PaginatedTrades' }
+  & Pick<PaginatedTrades, 'hasMore'>
+  & { items: Array<(
+    { __typename?: 'Trade' }
+    & TradeFragment
+  )> }
+);
+
+export type MakeTradeMutationVariables = Exact<{
+  name: Scalars['String'];
+  type: Scalars['String'];
+  position: Scalars['Int'];
+}>;
+
+
+export type MakeTradeMutation = (
+  { __typename?: 'Mutation' }
+  & { makeTrade: (
+    { __typename?: 'Trade' }
+    & TradeFragment
+  ) }
+);
+
+export type TradeHistoryQueryVariables = Exact<{
+  take: Scalars['Int'];
+  skip: Scalars['Int'];
+  userId: Scalars['String'];
+}>;
+
+
+export type TradeHistoryQuery = (
+  { __typename?: 'Query' }
+  & { history: (
+    { __typename?: 'PaginatedTrades' }
+    & PagedTradesFragment
   ) }
 );
 
@@ -1347,8 +1479,45 @@ export const StonkFragmentDoc = gql`
   url
   price
   marketcap
+  numPosts
+  position
 }
     `;
+export const PositionFragmentDoc = gql`
+    fragment position on Position {
+  name
+  price
+  position
+  currentPrice
+}
+    `;
+export const PagedPositionsFragmentDoc = gql`
+    fragment pagedPositions on PaginatedPositions {
+  items {
+    ...position
+  }
+  hasMore
+}
+    ${PositionFragmentDoc}`;
+export const TradeFragmentDoc = gql`
+    fragment trade on Trade {
+  id
+  name
+  type
+  price
+  position
+  createdAt
+  currentPrice
+}
+    `;
+export const PagedTradesFragmentDoc = gql`
+    fragment pagedTrades on PaginatedTrades {
+  items {
+    ...trade
+  }
+  hasMore
+}
+    ${TradeFragmentDoc}`;
 export const StatsFragmentDoc = gql`
     fragment stats on User {
   numMemeVotesGiven
@@ -1723,8 +1892,8 @@ export function useRedisGetMutation() {
   return Urql.useMutation<RedisGetMutation, RedisGetMutationVariables>(RedisGetDocument);
 };
 export const StonksDocument = gql`
-    query Stonks($take: Int!, $skip: Int!, $order: String!) {
-  stonks(take: $take, skip: $skip, order: $order) {
+    query Stonks($take: Int!, $skip: Int!, $onlyPositions: Boolean!, $order: String!) {
+  stonks(take: $take, skip: $skip, order: $order, onlyPositions: $onlyPositions) {
     items {
       ...stonk
     }
@@ -1735,6 +1904,39 @@ export const StonksDocument = gql`
 
 export function useStonksQuery(options: Omit<Urql.UseQueryArgs<StonksQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<StonksQuery>({ query: StonksDocument, ...options });
+};
+export const PositionsDocument = gql`
+    query Positions($take: Int!, $skip: Int!, $userId: String!) {
+  positions(take: $take, skip: $skip, userId: $userId) {
+    ...pagedPositions
+  }
+}
+    ${PagedPositionsFragmentDoc}`;
+
+export function usePositionsQuery(options: Omit<Urql.UseQueryArgs<PositionsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PositionsQuery>({ query: PositionsDocument, ...options });
+};
+export const MakeTradeDocument = gql`
+    mutation MakeTrade($name: String!, $type: String!, $position: Int!) {
+  makeTrade(name: $name, type: $type, position: $position) {
+    ...trade
+  }
+}
+    ${TradeFragmentDoc}`;
+
+export function useMakeTradeMutation() {
+  return Urql.useMutation<MakeTradeMutation, MakeTradeMutationVariables>(MakeTradeDocument);
+};
+export const TradeHistoryDocument = gql`
+    query TradeHistory($take: Int!, $skip: Int!, $userId: String!) {
+  history(take: $take, skip: $skip, userId: $userId) {
+    ...pagedTrades
+  }
+}
+    ${PagedTradesFragmentDoc}`;
+
+export function useTradeHistoryQuery(options: Omit<Urql.UseQueryArgs<TradeHistoryQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<TradeHistoryQuery>({ query: TradeHistoryDocument, ...options });
 };
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($token: String!, $newPassword: String!) {

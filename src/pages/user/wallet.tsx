@@ -8,7 +8,7 @@ import { useMeQuery } from "src/generated/graphql";
 import { hive } from "src/hiveConnection";
 import { urqlClient } from "src/urql/urqlClient";
 import useAsyncEffect from "use-async-effect";
-import { DoubleColLayout } from "./_doubleColLayout";
+import { DoubleColLayout } from "../_doubleColLayout";
 
 interface WalletProps {}
 

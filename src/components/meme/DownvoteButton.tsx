@@ -5,6 +5,7 @@ import { useToast } from "@chakra-ui/toast";
 import Humanize from "humanize-plus";
 import React from "react";
 import { MemeFragment, useDownVoteMemeMutation } from "src/generated/graphql";
+import { useHasVoted } from "src/hooks/useHasVoted";
 
 type DownvoteButtonProps = {
   meme: MemeFragment;
@@ -17,25 +18,12 @@ export const DownvoteButton: React.FC<DownvoteButtonProps> = (props) => {
     { fetching: downFetching },
     downVoteMemeFN,
   ] = useDownVoteMemeMutation();
-  const hasVoted = () => {
-    if (meme.hasUpvoted || meme.hasDownvoted) {
-      toast({
-        title: "Oops",
-        description: "You already voted this meme",
-        status: "warning",
-        duration: 3000,
-        isClosable: true,
-      });
-      return true;
-    } else {
-      return false;
-    }
-  };
+  const hasVoted = useHasVoted(meme);
   const handleDownvote = async () => {
-    if (!hasVoted()) {
+    if (!hasVoted) {
       const { data } = await downVoteMemeFN({ memeId: meme.id });
       if (data?.downVoteMeme) {
-        toast({ title: "Downvote Sent", status: "success" });
+        toast({ title: "Downvote Sent", status: "error" });
       }
     }
   };

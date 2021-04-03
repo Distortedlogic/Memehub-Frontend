@@ -3,6 +3,7 @@ import {
   Avatar,
   Button,
   Flex,
+  FlexProps,
   Image,
   Input,
   InputGroup,
@@ -19,7 +20,7 @@ import {
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
-import { useMeQuery } from "src/generated/graphql";
+import { useLogoutMutation, useMeQuery } from "src/generated/graphql";
 import { BUCKET_BASE_URL } from "src/utils/constants";
 
 interface NavBarProps {}
@@ -107,12 +108,37 @@ export const NavBar: React.FC<NavBarProps> = () => {
     </Flex>
   );
 };
-
+interface MenuItemProps extends FlexProps {
+  icon: string;
+  label: string;
+  route: string;
+}
+const MenuItem: React.FC<MenuItemProps> = (props) => {
+  const { icon, label, route, ...flexprops } = props;
+  const router = useRouter();
+  return (
+    <Flex
+      _hover={{
+        cursor: "pointer",
+        backgroundColor: "gray.800",
+        roundedTop: "md",
+      }}
+      py={2}
+      justifyContent="center"
+      alignItems="center"
+      onClick={() => router.push(route)}
+      {...flexprops}
+    >
+      <Image height="15px" src={BUCKET_BASE_URL + `/icons/${icon}.png`} />
+      <Text ml={4}>{label}</Text>
+    </Flex>
+  );
+};
 interface LoginProps {}
 
 const Login: React.FC<LoginProps> = () => {
-  const router = useRouter();
   const [{ data, error, fetching }] = useMeQuery();
+  const [, logoutFN] = useLogoutMutation();
   if (error) console.log(error);
   if (fetching || error) return <Button>Login</Button>;
   if (!data?.me) return <LoginButton />;
@@ -133,40 +159,33 @@ const Login: React.FC<LoginProps> = () => {
         <PopoverContent>
           <PopoverArrow />
           <PopoverBody rounded="md" backgroundColor="black" size="sm" p={0}>
-            <Flex
+            <MenuItem
+              icon="person"
+              label="Profile"
+              route="/user/me"
               _hover={{
                 cursor: "pointer",
                 backgroundColor: "gray.800",
                 roundedTop: "md",
               }}
-              p={2}
-              justifyContent="center"
-              alignItems="center"
-              onClick={() => router.push("/user/me")}
-            >
-              <Image
-                height="25px"
-                src={BUCKET_BASE_URL + "/icons/person.png"}
-              />
-              <Text ml={4}>Profile</Text>
-            </Flex>
-            <Flex
+            />
+            <MenuItem icon="wallet" label="Wallet" route="/user/wallet" />
+            <MenuItem
+              icon="portfolio"
+              label="Portfolio"
+              route="/user/portfolio"
+            />
+            <MenuItem
+              icon="logout"
+              label="Logout"
+              route="/user/logout"
+              onClick={() => logoutFN()}
               _hover={{
                 cursor: "pointer",
                 backgroundColor: "gray.800",
-                roundedTop: "md",
+                roundedBottom: "md",
               }}
-              p={2}
-              justifyContent="center"
-              alignItems="center"
-              onClick={() => router.push("/wallet")}
-            >
-              <Image
-                height="25px"
-                src={BUCKET_BASE_URL + "/icons/wallet.png"}
-              />
-              <Text ml={4}>Wallet</Text>
-            </Flex>
+            />
           </PopoverBody>
         </PopoverContent>
       </Popover>

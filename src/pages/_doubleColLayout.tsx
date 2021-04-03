@@ -14,7 +14,7 @@ export const DoubleColLayout: React.FC<DoubleColLayoutProps> = (props) => {
     <>
       <Grid
         position="sticky"
-        zIndex={1}
+        zIndex={1000}
         top={0}
         w="100%"
         templateRows="10vh 10vh"

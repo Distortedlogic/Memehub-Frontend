@@ -10,11 +10,14 @@ export const normalizedCache = cacheExchange({
   keys: {
     PaginatedMemes: () => null,
     PaginatedComments: () => null,
+    PaginatedRanks: () => null,
+    PaginatedStonks: () => null,
+    PaginatedPositions: () => null,
     LeaderBoard: () => null,
     Leader: () => null,
     Rank: () => null,
-    PaginatedRanks: () => null,
     Emoji: () => null,
+    Stonk: () => null,
   },
   resolvers: {
     Query: {

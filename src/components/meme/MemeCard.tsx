@@ -2,26 +2,18 @@ import { Button } from "@chakra-ui/button";
 import { useDisclosure } from "@chakra-ui/hooks";
 import { Image } from "@chakra-ui/image";
 import { Badge, Box, BoxProps, Flex, Text } from "@chakra-ui/layout";
-import {
-  Slider,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderTrack,
-} from "@chakra-ui/slider";
-import { Collapse } from "@chakra-ui/transition";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import ellipsize from "ellipsize";
-import { Form, Formik } from "formik";
 import Humanize from "humanize-plus";
 import { useRouter } from "next/router";
 import React from "react";
 import { AvatarLink } from "src/components/utils/AvatarLink";
 import { MemeFragment, UserFragment } from "src/generated/graphql";
-import { useHandleMemeHiveVote } from "src/hooks/useHandleHiveVote";
 import { ratioToColorGrade } from "src/utils/functions";
 import { DownvoteButton } from "./DownvoteButton";
+import { HiveVoteButtons } from "./HiveVoteButtons";
 import { UpvoteButton } from "./UpvoteButton";
 dayjs.extend(relativeTime);
 
@@ -34,28 +26,34 @@ interface MemeCardProps extends BoxProps {
 export const MemeCard: React.FC<MemeCardProps> = (props) => {
   let { meme, user, topfull } = props;
   const router = useRouter();
-
+  const { isOpen, onToggle } = useDisclosure();
   return (
-    <Flex
-      {...props}
-      justifyContent="space-between"
-      alignItems="center"
-      p={4}
-      rounded="md"
-    >
-      <Flex
-        _hover={{ cursor: "pointer" }}
-        onClick={() => {
-          router.push(`meme/${meme.id}`);
-        }}
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Image rounded="md" w="150px" src={meme.url} />
+    <Flex direction="column">
+      <Flex {...props} justifyContent="space-between" alignItems="center" p={4}>
+        <Flex
+          _hover={{ cursor: "pointer" }}
+          onClick={() => {
+            router.push(`meme/${meme.id}`);
+          }}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Image rounded="md" w="150px" src={meme.url} />
+        </Flex>
+        <TopBar meme={meme} user={user} topfull={topfull} />
+        <BottomBar
+          user={user}
+          meme={meme}
+          isOpen={isOpen}
+          onToggle={onToggle}
+        />
       </Flex>
-      <TopBar meme={meme} user={user} topfull={topfull} />
-
-      <BottomBar user={user} meme={meme} />
+      <HiveVoteButtons
+        meme={meme}
+        user={user}
+        isOpen={isOpen}
+        onToggle={onToggle}
+      />
     </Flex>
   );
 };
@@ -127,13 +125,17 @@ export const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
 interface BottomBarProps {
   user: UserFragment;
   meme: MemeFragment;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
+export const BottomBar: React.FC<BottomBarProps> = ({
+  meme,
+  isOpen,
+  onToggle,
+}) => {
   const { grade, color } = ratioToColorGrade(meme.ratio);
-  const { isOpen: hiveVoteOpen, onToggle: toggleHiveVote } = useDisclosure();
   const router = useRouter();
-  const handleHiveVote = useHandleMemeHiveVote(meme, user);
   return (
     <>
       <Flex justifyContent="center" align="center">
@@ -159,60 +161,12 @@ export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
             m={1}
             size="sm"
             meme={meme}
-            isLoading={hiveVoteOpen}
-            toggleHiveVote={toggleHiveVote}
+            isLoading={isOpen}
+            toggleHiveVote={onToggle}
           />
-          <DownvoteButton
-            isLoading={hiveVoteOpen}
-            m={1}
-            size="sm"
-            meme={meme}
-          />
+          <DownvoteButton isLoading={isOpen} m={1} size="sm" meme={meme} />
         </Flex>
       </Flex>
-      <Collapse in={hiveVoteOpen}>
-        <Formik
-          initialValues={{ voteWieght: 100 }}
-          onSubmit={async (values) => {
-            handleHiveVote(values.voteWieght * 100);
-          }}
-        >
-          {({ isSubmitting, values: { voteWieght }, setFieldValue }) => (
-            <Form>
-              <Flex mt={4} direction="column">
-                <Flex>
-                  <Slider
-                    onChange={(newValue) =>
-                      setFieldValue("voteWieght", newValue)
-                    }
-                    max={100}
-                    min={0}
-                    step={1}
-                    defaultValue={voteWieght}
-                  >
-                    <SliderTrack bg="gray.100" />
-                    <SliderFilledTrack bg="blue.500" />
-                    <SliderThumb size={6}>
-                      <Box color="green" />
-                    </SliderThumb>
-                  </Slider>
-                  <Button w="50px" ml={8}>
-                    {voteWieght}
-                  </Button>
-                </Flex>
-                <Button
-                  mt={2}
-                  type="submit"
-                  colorScheme="blue"
-                  isLoading={isSubmitting}
-                >
-                  Vote
-                </Button>
-              </Flex>
-            </Form>
-          )}
-        </Formik>
-      </Collapse>
     </>
   );
 };

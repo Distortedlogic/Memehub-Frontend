@@ -1,10 +1,11 @@
-import { Button } from "@chakra-ui/button";
 import { Image } from "@chakra-ui/image";
 import { Box, BoxProps, Flex, Text } from "@chakra-ui/layout";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import React from "react";
 import { StonkFragment } from "src/generated/graphql";
+import { BuyButton } from "./BuyButton";
+import { SellButton } from "./SellButton";
 dayjs.extend(relativeTime);
 
 interface StonkProps extends BoxProps {
@@ -27,18 +28,18 @@ export const StonkBox: React.FC<StonkProps> = (props) => {
         {stonk.name}
       </Text>
       <Text textAlign="center" size="sm" m={1}>
-        Marketcap - {stonk.marketcap}
+        Marketcap - {stonk.marketcap} GBP
       </Text>
       <Text textAlign="center" size="sm" m={1}>
-        Price - {stonk.price}
+        Price - {stonk.price} GBP
       </Text>
+      <Text textAlign="center">Post Count - {stonk.numPosts}</Text>
+      {stonk.position ? (
+        <Text textAlign="center">Your Position - {stonk.position}</Text>
+      ) : null}
       <Flex mt={2} justifyContent="center" align="center">
-        <Button size="sm" m={1}>
-          Buy
-        </Button>
-        <Button size="sm" m={1}>
-          sell
-        </Button>
+        <BuyButton name={stonk.name} price={stonk.price} />
+        <SellButton name={stonk.name} price={stonk.price} />
       </Flex>
     </Box>
   );

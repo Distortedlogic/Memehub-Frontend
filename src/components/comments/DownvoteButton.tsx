@@ -8,6 +8,7 @@ import {
   CommentFragment,
   useDownVoteCommentMutation,
 } from "src/generated/graphql";
+import { useHasVoted } from "src/hooks/useHasVoted";
 
 type DownvoteButtonProps = {
   comment: CommentFragment;
@@ -21,22 +22,9 @@ export const DownvoteButton: React.FC<DownvoteButtonProps> = (props) => {
     { fetching: downFetching },
     downVoteMemeFN,
   ] = useDownVoteCommentMutation();
-  const hasVoted = () => {
-    if (comment.hasUpvoted || comment.hasDownvoted) {
-      toast({
-        title: "Oops",
-        description: "You already voted this meme",
-        status: "warning",
-        duration: 3000,
-        isClosable: true,
-      });
-      return true;
-    } else {
-      return false;
-    }
-  };
+  const hasVoted = useHasVoted(comment);
   const handleDownvote = async () => {
-    if (!hasVoted()) {
+    if (!hasVoted) {
       const { data } = await downVoteMemeFN({ commentId: comment.id });
       if (data?.downVoteComment) {
         toast({ title: "Downvote Sent", status: "success" });

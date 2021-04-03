@@ -9,20 +9,26 @@ import { ScrollToTop } from "../utils/ScrollToTop";
 import { StonkBox } from "./StonkBox";
 import { StonkCard } from "./StonkCard";
 
-type StonkGridProps = {};
+type StonkGridProps = {
+  order: string;
+  onlyPositions: boolean;
+};
 const take = 16;
-export const StonkGrid: React.FC<StonkGridProps> = ({}) => {
+export const StonkGrid: React.FC<StonkGridProps> = ({
+  order,
+  onlyPositions,
+}) => {
   const {
     settings: { gridView },
   } = useStoreState((state) => state);
   const [skip, setSkip] = useState(0);
   const [{ data, fetching, error }] = useStonksQuery({
-    variables: { skip, take, order: "test" },
+    variables: { skip, take, order, onlyPositions },
   });
   const loadMore = () => setSkip(skip + take);
   if (error) console.log(error);
   if (fetching || error || !data?.stonks) {
-    return <></>;
+    return <Flex h="80vh"></Flex>;
   }
   const StonkDisplay = gridView === "list" ? StonkCard : StonkBox;
   const { hasMore, items: stonks } = data.stonks;

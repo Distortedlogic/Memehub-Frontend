@@ -1,37 +1,27 @@
-import { Button } from "@chakra-ui/button";
 import { useDisclosure } from "@chakra-ui/hooks";
 import { Image } from "@chakra-ui/image";
-import { Box, BoxProps, Flex, Text } from "@chakra-ui/layout";
-import {
-  Slider,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderTrack,
-} from "@chakra-ui/slider";
-import { Collapse } from "@chakra-ui/transition";
+import { Box, Flex, FlexProps, Text } from "@chakra-ui/layout";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Form, Formik } from "formik";
 import React from "react";
 import { AvatarLink } from "src/components/utils/AvatarLink";
 import { UserMemeFragment } from "src/generated/graphql";
-import { useHandleMemeHiveVote } from "src/hooks/useHandleHiveVote";
 import { ratioToColorGrade } from "src/utils/functions";
 import { DownvoteButton } from "./DownvoteButton";
+import { HiveVoteButtons } from "./HiveVoteButtons";
 import { UpvoteButton } from "./UpvoteButton";
 dayjs.extend(relativeTime);
 
-interface MemeDisplayProps extends BoxProps {
+interface MemeDisplayProps extends FlexProps {
   meme: UserMemeFragment;
 }
 
 export const MemeDisplay: React.FC<MemeDisplayProps> = (props) => {
-  let { meme } = props;
+  let { meme, ...flexprops } = props;
   const { grade, color } = ratioToColorGrade(meme.ratio);
-  const { isOpen: hiveVoteOpen, onToggle: toggleHiveVote } = useDisclosure();
-  const handleHiveVote = useHandleMemeHiveVote(meme, meme.user);
+  const { isOpen, onToggle } = useDisclosure();
   return (
-    <Box {...props} rounded="md">
+    <Flex direction="column" {...flexprops}>
       <Flex
         rounded="md"
         backgroundColor="black"
@@ -68,57 +58,20 @@ export const MemeDisplay: React.FC<MemeDisplayProps> = (props) => {
         </Text>
         <Flex justifyContent="center" alignItems="center">
           <UpvoteButton
-            isLoading={hiveVoteOpen}
+            isLoading={isOpen}
             meme={meme}
-            toggleHiveVote={toggleHiveVote}
+            toggleHiveVote={onToggle}
             m={1}
           />
-          <DownvoteButton m={1} isLoading={hiveVoteOpen} meme={meme} />
+          <DownvoteButton m={1} isLoading={isOpen} meme={meme} />
         </Flex>
-        <Collapse in={hiveVoteOpen}>
-          <Formik
-            initialValues={{ voteWieght: 100 }}
-            onSubmit={async (values) => {
-              handleHiveVote(values.voteWieght * 100);
-            }}
-          >
-            {({ isSubmitting, values: { voteWieght }, setFieldValue }) => (
-              <Form>
-                <Flex mt={4} direction="column">
-                  <Flex>
-                    <Slider
-                      onChange={(newValue) =>
-                        setFieldValue("voteWieght", newValue)
-                      }
-                      max={100}
-                      min={0}
-                      step={1}
-                      defaultValue={voteWieght}
-                    >
-                      <SliderTrack bg="gray.100" />
-                      <SliderFilledTrack bg="blue.500" />
-                      <SliderThumb size={6}>
-                        <Box color="green" />
-                      </SliderThumb>
-                    </Slider>
-                    <Button w="50px" ml={8}>
-                      {voteWieght}
-                    </Button>
-                  </Flex>
-                  <Button
-                    mt={2}
-                    type="submit"
-                    colorScheme="blue"
-                    isLoading={isSubmitting}
-                  >
-                    Vote
-                  </Button>
-                </Flex>
-              </Form>
-            )}
-          </Formik>
-        </Collapse>
       </Flex>
-    </Box>
+      <HiveVoteButtons
+        meme={meme}
+        user={meme.user}
+        isOpen={isOpen}
+        onToggle={onToggle}
+      />
+    </Flex>
   );
 };

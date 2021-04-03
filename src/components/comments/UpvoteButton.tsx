@@ -10,6 +10,7 @@ import {
   useMeQuery,
   useUpVoteCommentMutation,
 } from "src/generated/graphql";
+import { useHasVoted } from "src/hooks/useHasVoted";
 
 type UpvoteButtonProps = {
   comment: CommentFragment;
@@ -28,22 +29,9 @@ export const UpvoteButton: React.FC<UpvoteButtonProps> = (props) => {
   if (error) console.log("error", error);
   if (fetching || !data) return <></>;
   const { me } = data;
-  const hasVoted = () => {
-    if (comment.hasUpvoted || comment.hasDownvoted) {
-      toast({
-        title: "Oops",
-        description: "You already voted this meme",
-        status: "warning",
-        duration: 3000,
-        isClosable: true,
-      });
-      return true;
-    } else {
-      return false;
-    }
-  };
+  const hasVoted = useHasVoted(comment);
   const handleUpvote = async () => {
-    if (!hasVoted()) {
+    if (!hasVoted) {
       if (
         me?.isHive &&
         comment.isHive &&

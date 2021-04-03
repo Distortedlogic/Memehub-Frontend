@@ -7,7 +7,7 @@ export const errorExchange: Exchange = ({ forward }) => (ops$) => {
     forward(ops$),
     tap(({ error }) => {
       if (error?.message.includes("not authenticated")) {
-        Router.replace("/onboarding/memehub/login");
+        Router.replace("/onboarding/hiveLogin");
       }
     })
   );

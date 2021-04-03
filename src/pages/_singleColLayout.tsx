@@ -13,7 +13,7 @@ export const SingleColLayout: React.FC<SingleColLayoutProps> = (props) => {
       <Grid
         position="sticky"
         backgroundColor="black"
-        zIndex={1}
+        zIndex={1000}
         top={0}
         w="100%"
         templateRows="10vh 10vh"

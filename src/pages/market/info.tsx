@@ -4,13 +4,13 @@ import { withUrqlClient } from "next-urql";
 import React from "react";
 import { urqlClient } from "src/urql/urqlClient";
 import { BUCKET_BASE_URL } from "src/utils/constants";
-import { MarketLayout } from "./_marketLayout";
+import { DoubleColLayout } from "../_doubleColLayout";
 
 interface InfoProps {}
 
 const Info: React.FC<InfoProps> = () => {
   return (
-    <MarketLayout>
+    <DoubleColLayout>
       <Flex py={4} w="100%" h="100%" justifyContent="center">
         <Flex justifyContent="space-between" w="100%">
           <Flex w="100%" justifyContent="center" alignItems="center">
@@ -35,18 +35,18 @@ const Info: React.FC<InfoProps> = () => {
             </Text>
             <Text mt={6}>
               Prices is correlated to upvotes per post, while Marketcap is
-              corelated to upvotes from all posts. This is over a specified
+              correlated to upvotes from all posts. This is over a specified
               aggregation period.
             </Text>
             <Text mt={6}>
               The Stonk Market updates daily at midnight UTC, the current
-              aggregation persion is one week, and memes are scraped from Reddit
-              r/memes and r/dankmemes.
+              aggregation persion is one month, and memes are scraped from
+              Reddit r/memes and r/dankmemes.
             </Text>
           </Flex>
         </Flex>
       </Flex>
-    </MarketLayout>
+    </DoubleColLayout>
   );
 };
 export default withUrqlClient(urqlClient)(Info);

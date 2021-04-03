@@ -33,7 +33,7 @@ import {
 import { DoubleColLayout } from "src/pages/_doubleColLayout";
 import { BUCKET_BASE_URL } from "src/utils/constants";
 import { ratioToColorGrade } from "src/utils/functions";
-import { MemeGrid } from "./meme/MemeGrid";
+import { MemeGrid } from "../meme/MemeGrid";
 dayjs.extend(relativeTime);
 const take = 16;
 interface ProfileProps {
@@ -56,13 +56,12 @@ export const Profile: React.FC<ProfileProps> = ({ user }) => {
             src={BUCKET_BASE_URL + "/icons/logout.png"}
           />
         </Flex>
-        <Flex justifyContent="center">
+        <Flex my={2} justifyContent="center">
           <Divider w="95%" />
         </Flex>
         <Flex py={2} direction="column" alignItems="center">
           <Flex
             mr={4}
-            my={2}
             justifyContent="centerr"
             alignItems="center"
             direction="column"
@@ -74,8 +73,8 @@ export const Profile: React.FC<ProfileProps> = ({ user }) => {
           </Flex>
           <RankScoreTable user={user} />
         </Flex>
-        <Flex w="95%" mb={4}>
-          <Divider />
+        <Flex my={2} justifyContent="center">
+          <Divider w="95%" />
         </Flex>
         <Flex justifyContent="space-around">
           <Flex>

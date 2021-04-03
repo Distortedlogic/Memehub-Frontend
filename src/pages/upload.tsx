@@ -34,21 +34,28 @@ const Upload: React.FC<UploadProps> = () => {
         initialValues={{
           file: undefined,
           title: "",
+          url: undefined,
           isHive: false,
         }}
         onSubmit={async (values) => {
-          const memeId = await uploadFN(values.file, postToHive, values.title);
-          if (memeId) {
-            router.push(`meme/${memeId}`);
-          } else {
-            toast({
-              title: "Oh no something went wrong",
-              status: "error",
-            });
+          if (values.file && values.title) {
+            const memeId = await uploadFN(
+              values.file,
+              postToHive,
+              values.title
+            );
+            if (memeId) {
+              router.push(`meme/${memeId}`);
+            } else {
+              toast({
+                title: "Oh no something went wrong",
+                status: "error",
+              });
+            }
           }
         }}
       >
-        {({ values: { file, isHive }, setFieldValue, isSubmitting }) => (
+        {({ values: { isHive, url }, setFieldValue, isSubmitting }) => (
           <Form>
             <Flex
               direction="column"
@@ -58,27 +65,22 @@ const Upload: React.FC<UploadProps> = () => {
             >
               <Flex p={6} direction="column" w="60%">
                 <InputField mb={4} name="title" placeholder="Title" />
-                {file ? (
-                  <Flex
-                    direction="column"
-                    justifyContent="center"
-                    alignItems="center"
-                    mb={4}
-                  >
-                    <Box _hover={{ cursor: "pointer" }}>
-                      <Image
-                        p={2}
-                        maxHeight="330px"
-                        src={URL.createObjectURL(file)}
-                      />
-                    </Box>
-                  </Flex>
-                ) : (
-                  <Image
-                    mb={4}
-                    src={`${BUCKET_BASE_URL}/misc/pepecollage.png`}
-                  />
-                )}
+                <Flex
+                  direction="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  mb={4}
+                >
+                  <Box _hover={{ cursor: "pointer" }}>
+                    <Image
+                      p={2}
+                      maxHeight="330px"
+                      src={
+                        url ? url : `${BUCKET_BASE_URL}/misc/pepecollage.png`
+                      }
+                    />
+                  </Box>
+                </Flex>
                 <Flex>
                   <input
                     id="file"
@@ -94,6 +96,12 @@ const Upload: React.FC<UploadProps> = () => {
                         "file",
                         e.currentTarget.files
                           ? e.currentTarget.files[0]
+                          : undefined
+                      );
+                      setFieldValue(
+                        "url",
+                        e.currentTarget.files
+                          ? URL.createObjectURL(e.currentTarget.files[0])
                           : undefined
                       );
                     }}
@@ -115,7 +123,7 @@ const Upload: React.FC<UploadProps> = () => {
                     <FontAwesomeIcon icon={["fas", "trash"]} />
                   </Button>
                 </Flex>
-                <Checkbox mt={2} onClick={() => setPostToHive(!postToHive)}>
+                <Checkbox mt={2} onChange={() => setPostToHive(!postToHive)}>
                   <Text>Post to Hive</Text>
                 </Checkbox>
                 {me.isHive ? null : (
