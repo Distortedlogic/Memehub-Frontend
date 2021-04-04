@@ -1,3 +1,4 @@
+import { Flex } from "@chakra-ui/layout";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
@@ -17,14 +18,14 @@ const me: React.FC<meProps> = () => {
   if (fetching || error) {
     return (
       <DoubleColLayout>
-        <></>
+        <Flex h="80vh"></Flex>
       </DoubleColLayout>
     );
   } else if (!data?.me) {
     router.push("/onboarding/hiveLogin");
     return (
       <DoubleColLayout>
-        <></>
+        <Flex h="80vh"></Flex>
       </DoubleColLayout>
     );
   }

@@ -7,14 +7,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React from "react";
 import InputField from "src/components/utils/InputField";
 import { useIsAuth } from "src/hooks/isAuth";
 import { useClipboard } from "src/hooks/useClipboard";
 import { useUpload } from "src/hooks/useUpload";
 import { urqlClient } from "src/urql/urqlClient";
 import { BUCKET_BASE_URL } from "src/utils/constants";
-import { SingleColLayout } from "./_singleColLayout";
+import { SingleColLayout } from "../_singleColLayout";
 
 interface UploadProps {}
 
@@ -24,7 +24,6 @@ const Upload: React.FC<UploadProps> = () => {
   const router = useRouter();
   const uploadFN = useUpload();
   const getFromClipboard = useClipboard();
-  const [postToHive, setPostToHive] = useState(false);
   if (error) console.log("error", error);
   if (fetching || !data?.me) return <></>;
   const { me } = data;
@@ -41,17 +40,19 @@ const Upload: React.FC<UploadProps> = () => {
           if (values.file && values.title) {
             const memeId = await uploadFN(
               values.file,
-              postToHive,
+              values.isHive,
               values.title
             );
             if (memeId) {
-              router.push(`meme/${memeId}`);
+              router.push(`/meme/${memeId}`);
             } else {
               toast({
                 title: "Oh no something went wrong",
                 status: "error",
               });
             }
+          } else {
+            toast({ title: "missing file or title", status: "error" });
           }
         }}
       >
@@ -123,7 +124,10 @@ const Upload: React.FC<UploadProps> = () => {
                     <FontAwesomeIcon icon={["fas", "trash"]} />
                   </Button>
                 </Flex>
-                <Checkbox mt={2} onChange={() => setPostToHive(!postToHive)}>
+                <Checkbox
+                  mt={2}
+                  onChange={() => setFieldValue("isHive", !isHive)}
+                >
                   <Text>Post to Hive</Text>
                 </Checkbox>
                 {me.isHive ? null : (
@@ -137,7 +141,9 @@ const Upload: React.FC<UploadProps> = () => {
                   </Button>
                 )}
                 <Button mt={4} type="submit" isLoading={isSubmitting}>
-                  {isHive ? "Posting to Hive" : "Posting To Memehub Only"}
+                  {isHive
+                    ? "Posting to Hive and Memehub"
+                    : "Posting To Memehub Only"}
                 </Button>
               </Flex>
             </Flex>

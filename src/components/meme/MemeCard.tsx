@@ -14,6 +14,7 @@ import { MemeFragment, UserFragment } from "src/generated/graphql";
 import { ratioToColorGrade } from "src/utils/functions";
 import { DownvoteButton } from "./DownvoteButton";
 import { HiveVoteButtons } from "./HiveVoteButtons";
+import { PeakdMemeLink } from "./PeakdLink";
 import { UpvoteButton } from "./UpvoteButton";
 dayjs.extend(relativeTime);
 
@@ -105,15 +106,22 @@ export const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
             {dayjs(meme.createdAt).fromNow()}
           </Text>
         </Flex>
-        <Text textAlign="center">{ellipsize(meme.title, 16)}</Text>
+        <Flex>
+          <PeakdMemeLink mr={4} meme={meme} user={user} imgHeight="30px" />
+          <Text textAlign="center">{ellipsize(meme.title, 40)}</Text>
+        </Flex>
       </Flex>
     );
   } else {
     return (
       <Flex mb={4} justifyContent="space-between">
-        <Text mx={2} textOverflow="ellipsis">
-          {ellipsize(meme.title, 20)}
-        </Text>
+        <Flex>
+          <PeakdMemeLink mr={4} meme={meme} user={user} imgHeight="30px" />
+          <Text mx={2} textOverflow="ellipsis">
+            {ellipsize(meme.title, 20)}
+          </Text>
+        </Flex>
+        <Text textAlign="center">{ellipsize(meme.title, 40)}</Text>
         <Text fontSize="sm" mx={2}>
           {dayjs(meme.createdAt).fromNow()}
         </Text>

@@ -14,8 +14,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@chakra-ui/popover";
+import { Table, Tbody, Td, Tr } from "@chakra-ui/table";
 import { useToast } from "@chakra-ui/toast";
-import { Formik } from "formik";
+import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import { useMeQuery } from "src/generated/graphql";
@@ -24,9 +25,14 @@ import { useMakeTradeMutation } from "../../generated/graphql";
 interface SellButtonProps {
   name: string;
   price: number;
+  currentPosition: number;
 }
 
-export const SellButton: React.FC<SellButtonProps> = ({ name }) => {
+export const SellButton: React.FC<SellButtonProps> = ({
+  name,
+  price,
+  currentPosition,
+}) => {
   const [, makeTradeFN] = useMakeTradeMutation();
   const [{ data: meData, error }] = useMeQuery();
   const toast = useToast();
@@ -41,6 +47,7 @@ export const SellButton: React.FC<SellButtonProps> = ({ name }) => {
         type: "sell",
         position,
       });
+      console.log("data", data);
       if (!error && data?.makeTrade) {
         const { makeTrade } = data;
         meData.me.gbp += makeTrade.price * makeTrade.position;
@@ -78,30 +85,61 @@ export const SellButton: React.FC<SellButtonProps> = ({ name }) => {
             }}
           >
             {({ isSubmitting, values: { position }, setFieldValue }) => (
-              <Flex direction="column">
-                <NumberInput
-                  onChange={(valueString) =>
-                    setFieldValue("position", parseInt(valueString))
-                  }
-                  defaultValue={position}
-                  min={0}
-                >
-                  <NumberInputField />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-                <Button
-                  isLoading={isSubmitting}
-                  mt={2}
-                  w="100%"
-                  type="submit"
-                  colorScheme="red"
-                >
-                  Sell
-                </Button>
-              </Flex>
+              <Form>
+                <Flex direction="column">
+                  <NumberInput
+                    onChange={(valueString) =>
+                      setFieldValue("position", parseInt(valueString))
+                    }
+                    defaultValue={position}
+                    min={0}
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                  <Table>
+                    <Tbody>
+                      <Tr>
+                        <Td>Balance</Td>
+                        <Td isNumeric>{meData?.me?.gbp} GBP</Td>
+                      </Tr>
+                      <Tr>
+                        <Td>Position</Td>
+                        <Td isNumeric>{currentPosition} GBP</Td>
+                      </Tr>
+                      <Tr>
+                        <Td>Revenue</Td>
+                        <Td isNumeric>{position * price} GBP</Td>
+                      </Tr>
+                      <Tr>
+                        <Td>New Balance</Td>
+                        <Td isNumeric>
+                          {meData?.me?.gbp
+                            ? meData.me.gbp + position * price
+                            : 0}{" "}
+                          GBP
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td>New Position</Td>
+                        <Td isNumeric>{currentPosition - position} GBP</Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
+                  <Button
+                    isLoading={isSubmitting}
+                    mt={2}
+                    w="100%"
+                    type="submit"
+                    colorScheme="red"
+                  >
+                    Sell
+                  </Button>
+                </Flex>
+              </Form>
             )}
           </Formik>
         </PopoverBody>

@@ -8,11 +8,13 @@ import {
   Image,
   Stack,
   Text,
+  Tooltip,
   useToast,
 } from "@chakra-ui/react";
 import { ResponsiveBar } from "@nivo/bar";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import Humanize from "humanize-plus";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -23,7 +25,6 @@ import {
   CommentFragment,
   useCurrentRanksQuery,
   useDownVoteCommentMutation,
-  useLogoutMutation,
   UserFragment,
   useUpVoteCommentMutation,
   useUserCommentsQuery,
@@ -31,8 +32,7 @@ import {
   useUserRanksQuery,
 } from "src/generated/graphql";
 import { DoubleColLayout } from "src/pages/_doubleColLayout";
-import { BUCKET_BASE_URL } from "src/utils/constants";
-import { ratioToColorGrade } from "src/utils/functions";
+import { capitalizeFirstLetter, ratioToColorGrade } from "src/utils/functions";
 import { MemeGrid } from "../meme/MemeGrid";
 dayjs.extend(relativeTime);
 const take = 16;
@@ -41,39 +41,36 @@ interface ProfileProps {
 }
 
 export const Profile: React.FC<ProfileProps> = ({ user }) => {
-  const [, logoutFN] = useLogoutMutation();
   const [isMemes, setIsMemes] = useState(true);
   const [order, setOrder] = useState("new");
   return (
     <DoubleColLayout>
-      <Flex direction="column">
-        <Flex m={2} p={2} justify="space-between">
-          <Text>Profile</Text>
-          <Image
-            _hover={{ cursor: "pointer" }}
-            onClick={() => logoutFN()}
-            height="20px"
-            src={BUCKET_BASE_URL + "/icons/logout.png"}
-          />
-        </Flex>
-        <Flex my={2} justifyContent="center">
-          <Divider w="95%" />
-        </Flex>
-        <Flex py={2} direction="column" alignItems="center">
-          <Flex
-            mr={4}
-            justifyContent="centerr"
-            alignItems="center"
-            direction="column"
-          >
+      <Flex direction="column" mt={4}>
+        <Flex w="100%" alignItems="center" justifyContent="space-around">
+          <RankScoreTable user={user} isMhp={true} />
+          <Flex alignItems="center" direction="column">
             <Avatar src={user.avatar} size="xl" />
             <Text textAlign="center" py={2} fontWeight="bold" fontSize="20px">
               {user.username}
             </Text>
           </Flex>
-          <RankScoreTable user={user} />
+          <RankScoreTable user={user} isMhp={false} />
         </Flex>
-        <Flex my={2} justifyContent="center">
+        <Flex
+          mt={4}
+          mx={6}
+          h="150px"
+          alignItems="center"
+          justifyContent="space-around"
+        >
+          <Flex h="150px" w="45%" mx={2}>
+            <WeeklyPL isMhp={true} userId={user.id} />
+          </Flex>
+          <Flex h="150px" w="45%" mx={2}>
+            <WeeklyPL isMhp={false} userId={user.id} />
+          </Flex>
+        </Flex>
+        <Flex my={2} mb={4} justifyContent="center">
           <Divider w="95%" />
         </Flex>
         <Flex justifyContent="space-around">
@@ -267,69 +264,103 @@ export const CommentBox: React.FC<CommentBoxProps> = (props) => {
   );
 };
 
+interface BadgeItemProps {
+  timeframe: string;
+  extract: (timeframe: string) => number;
+}
+const BadgeItem: React.FC<BadgeItemProps> = ({ timeframe, extract }) => (
+  <Tooltip hasArrow label={`${extract(timeframe)}`}>
+    <Badge _hover={{ pointer: "cursor" }} textAlign="center">
+      {capitalizeFirstLetter(timeframe)}:{" "}
+      {Humanize.compactInteger(extract(timeframe))}
+    </Badge>
+  </Tooltip>
+);
+
 interface RankScoreTableProps {
   user: UserFragment;
+  isMhp: boolean;
 }
 
-const RankScoreTable: React.FC<RankScoreTableProps> = ({ user }) => {
+const RankScoreTable: React.FC<RankScoreTableProps> = ({ user, isMhp }) => {
   const [{ fetching, error, data }] = useCurrentRanksQuery({
     variables: { userId: user.id },
   });
   if (error) console.log(error);
   if (fetching || !data) return <></>;
-  const extractRank = (timeFrame: string) =>
-    data?.currentRanks.filter((rank) => rank.timeFrame === timeFrame)[0].rank;
-  const extractScore = (timeFrame: string) =>
-    data?.currentRanks.filter((rank) => rank.timeFrame === timeFrame)[0].mhp;
+
+  const extractRank = isMhp
+    ? (timeFrame: string) =>
+        data?.currentRanks.filter((rank) => rank.timeFrame === timeFrame)[0]
+          .mhpRank
+    : (timeFrame: string) =>
+        data?.currentRanks.filter((rank) => rank.timeFrame === timeFrame)[0]
+          .gbpRank;
+  const extractScore = isMhp
+    ? (timeFrame: string) =>
+        data?.currentRanks.filter((rank) => rank.timeFrame === timeFrame)[0].mhp
+    : (timeFrame: string) =>
+        data?.currentRanks.filter((rank) => rank.timeFrame === timeFrame)[0]
+          .gbp;
+
   return (
     <Flex
+      px={6}
+      direction="column"
       w="100%"
-      h="150px"
+      justify="center"
       alignItems="center"
-      pl={4}
-      justifyContent="space-around"
     >
-      <Flex mr={6}>
-        <Stack mr={4}>
-          <Badge textAlign="center">Rank</Badge>
-          <Badge textAlign="center">Day: {extractRank("day")}</Badge>
-          <Badge textAlign="center">Week: {extractRank("week")}</Badge>
-          <Badge textAlign="center">Month: {extractRank("month")}</Badge>
-          <Badge textAlign="center">Ever: {extractRank("ever")}</Badge>
-        </Stack>
-        <Stack mr={4}>
-          <Badge textAlign="center">Score</Badge>
-          <Badge textAlign="center">Day: {extractScore("day")}</Badge>
-          <Badge textAlign="center">Week: {extractScore("week")}</Badge>
-          <Badge textAlign="center">Month: {extractScore("month")}</Badge>
-          <Badge textAlign="center">Ever: {extractScore("ever")}</Badge>
-        </Stack>
+      <Flex direction="column">
+        <Flex justifyContent="center">
+          <Text fontWeight="bold">{isMhp ? "MHP" : "GBP"}</Text>
+        </Flex>
+        <Flex>
+          <Stack mr={2} justifyContent="center">
+            <Badge textAlign="center">Rank</Badge>
+            <BadgeItem timeframe="day" extract={extractRank} />
+            <BadgeItem timeframe="week" extract={extractRank} />
+            <BadgeItem timeframe="month" extract={extractRank} />
+            <BadgeItem timeframe="ever" extract={extractRank} />
+          </Stack>
+          <Stack>
+            <Badge textAlign="center">Amount</Badge>
+            <BadgeItem timeframe="day" extract={extractScore} />
+            <BadgeItem timeframe="week" extract={extractScore} />
+            <BadgeItem timeframe="month" extract={extractScore} />
+            <BadgeItem timeframe="ever" extract={extractScore} />
+          </Stack>
+        </Flex>
       </Flex>
-
-      <WeeklyPL userId={user.id} />
     </Flex>
   );
 };
 
 interface weeklyPLProps {
   userId: string;
+  isMhp: boolean;
 }
 
-const WeeklyPL: React.FC<weeklyPLProps> = ({ userId }) => {
+const WeeklyPL: React.FC<weeklyPLProps> = ({ userId, isMhp }) => {
   const [{ fetching, data, error }] = useUserRanksQuery({
     variables: { num: 8, userId, timeFrame: "ever" },
   });
   if (error) console.log(error);
   if (fetching || !data) return <></>;
   const { userRanks } = data;
-  const points_days = Array.from(Array(userRanks.length - 1).keys()).map(
-    (idx) => {
-      return {
-        points: userRanks[idx + 1].mhp - userRanks[idx].mhp,
-        day: new Date(userRanks[idx + 1].createdAt).getDate(),
-      };
-    }
-  );
+  const points_days = isMhp
+    ? Array.from(Array(userRanks.length - 1).keys()).map((idx) => {
+        return {
+          points: userRanks[idx + 1].mhp - userRanks[idx].mhp,
+          day: new Date(userRanks[idx + 1].createdAt).getDate(),
+        };
+      })
+    : Array.from(Array(userRanks.length - 1).keys()).map((idx) => {
+        return {
+          points: userRanks[idx + 1].gbp - userRanks[idx].gbp,
+          day: new Date(userRanks[idx + 1].createdAt).getDate(),
+        };
+      });
   const tickValues = [...new Set(points_days.map((item) => item.points))];
   return (
     <ResponsiveBar
@@ -337,7 +368,7 @@ const WeeklyPL: React.FC<weeklyPLProps> = ({ userId }) => {
       keys={["points"]}
       indexBy="day"
       theme={{ textColor: "#eee" }}
-      margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+      margin={{ top: 10, right: 10, bottom: 50, left: 50 }}
       padding={0.3}
       valueScale={{ type: "linear" }}
       colors={(data: any) => {
@@ -360,7 +391,7 @@ const WeeklyPL: React.FC<weeklyPLProps> = ({ userId }) => {
         tickPadding: 5,
         tickRotation: 0,
         tickValues: tickValues.length >= 5 ? 5 : tickValues.length,
-        legend: "MHP P/L",
+        legend: `${isMhp ? "MHP " : "GBP "} P/L`,
         legendPosition: "middle",
         legendOffset: -40,
       }}

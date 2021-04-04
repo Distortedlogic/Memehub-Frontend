@@ -28,7 +28,7 @@ export const Login: React.FC<LoginProps> = () => {
       if (errors) {
         setErrors(toErrorMap(errors));
       } else if (user) {
-        router.push("/top-ratio/daily");
+        router.push("/top/daily");
       }
     }
   };

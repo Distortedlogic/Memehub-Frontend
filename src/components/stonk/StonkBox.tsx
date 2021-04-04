@@ -38,8 +38,16 @@ export const StonkBox: React.FC<StonkProps> = (props) => {
         <Text textAlign="center">Your Position - {stonk.position}</Text>
       ) : null}
       <Flex mt={2} justifyContent="center" align="center">
-        <BuyButton name={stonk.name} price={stonk.price} />
-        <SellButton name={stonk.name} price={stonk.price} />
+        <BuyButton
+          currentPosition={stonk.position}
+          name={stonk.name}
+          price={stonk.price}
+        />
+        <SellButton
+          currentPosition={stonk.position}
+          name={stonk.name}
+          price={stonk.price}
+        />
       </Flex>
     </Box>
   );

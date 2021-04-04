@@ -43,7 +43,7 @@ const hiveLogin: React.FC<hiveLoginProps> = () => {
             if (router.query.next) {
               router.push(router.query.next as string);
             } else {
-              router.push("/top-ratio/daily");
+              router.push("/top/daily");
             }
           }
         } else {

@@ -35,17 +35,17 @@ export const Pagination = (__typename: string): Resolver => {
       (hasMore, key) => hasMore && (cache.resolve(key, "hasMore") as boolean),
       true
     );
-    if (__typename === "PaginatedMemes") {
-      console.log("info", info);
-      console.log("parentKey", parentKey);
-      console.log("fieldName", fieldName);
-      console.log("currentKey", currentKey);
-      console.log("info.partial", info.partial);
-      console.log("fieldInfos", fieldInfos);
-      console.log("keys", keys);
-      console.log("items", items);
-      console.log("hasMore", hasMore);
-    }
+    // if (__typename === "PaginatedMemes") {
+    //   console.log("info", info);
+    //   console.log("parentKey", parentKey);
+    //   console.log("fieldName", fieldName);
+    //   console.log("currentKey", currentKey);
+    //   console.log("info.partial", info.partial);
+    //   console.log("fieldInfos", fieldInfos);
+    //   console.log("keys", keys);
+    //   console.log("items", items);
+    //   console.log("hasMore", hasMore);
+    // }
     return { __typename, hasMore, items };
   };
 };

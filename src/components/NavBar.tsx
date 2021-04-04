@@ -97,7 +97,7 @@ export const NavBar: React.FC<NavBarProps> = () => {
         <Tooltip hasArrow label="Upload A Meme">
           <Image
             _hover={{ cursor: "pointer" }}
-            onClick={() => router.push("/upload")}
+            onClick={() => router.push("/meme/upload")}
             height="30px"
             src={BUCKET_BASE_URL + "/icons/rocket.png"}
             mr={8}

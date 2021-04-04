@@ -3,6 +3,10 @@ import { compress, EImageType } from "image-conversion";
 import { FieldError } from "./../generated/graphql";
 export const getHash = async (text: string) => SHA256(text).toString();
 
+export const capitalizeFirstLetter = (string: string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
 // convert upvote percentage to grade and color
 export const ratioToColorGrade = (
   ratio: number

@@ -8,6 +8,7 @@ import { useStoreState } from "src/store/store";
 import { ScrollToTop } from "../utils/ScrollToTop";
 import { StonkBox } from "./StonkBox";
 import { StonkCard } from "./StonkCard";
+import { StonkGraph } from "./StonkGraph";
 
 type StonkGridProps = {
   order: string;
@@ -32,9 +33,30 @@ export const StonkGrid: React.FC<StonkGridProps> = ({
   }
   const StonkDisplay = gridView === "list" ? StonkCard : StonkBox;
   const { hasMore, items: stonks } = data.stonks;
+  const graphHeight = "200px";
   const stonkComponents = stonks.map((stonk) => (
     <Fragment key={stonk.name}>
-      <StonkDisplay stonk={stonk} />
+      <Flex justifyContent="center">
+        <StonkDisplay stonk={stonk} />
+        {gridView === "blog" ? (
+          <Flex w="100%" direction="column">
+            <Flex h={graphHeight} w="100%">
+              <StonkGraph
+                minHeight={graphHeight}
+                isMarketcap={true}
+                name={stonk.name}
+              />
+            </Flex>
+            <Flex h={graphHeight} w="100%">
+              <StonkGraph
+                minHeight={graphHeight}
+                isMarketcap={false}
+                name={stonk.name}
+              />
+            </Flex>
+          </Flex>
+        ) : null}
+      </Flex>
       <Divider />
     </Fragment>
   ));

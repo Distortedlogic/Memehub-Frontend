@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/layout";
+import { Divider, Flex } from "@chakra-ui/layout";
 import { withUrqlClient } from "next-urql";
 import React from "react";
 import { Positions } from "src/components/portfolio/Positions";
@@ -21,9 +21,10 @@ const portfolio: React.FC<portfolioProps> = () => {
   const { me } = data;
   return (
     <DoubleColLayout>
-      <Flex pl={6} h="80vh" direction="column">
-        <Positions mb={6} userId={me.id} />
-        <TradeHistory userId={me.id} />
+      <Flex mb={4} pl={6} minHeight="80vh" direction="column">
+        <Positions maxHeight="80vh" overflow="auto" userId={me.id} />
+        <Divider my={4} />
+        <TradeHistory maxHeight="80vh" overflow="auto" userId={me.id} />
       </Flex>
     </DoubleColLayout>
   );

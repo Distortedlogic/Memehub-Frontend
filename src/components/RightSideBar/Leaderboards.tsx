@@ -10,6 +10,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useRankingQuery, UserRankFragment } from "src/generated/graphql";
 import { BUCKET_BASE_URL } from "src/utils/constants";
@@ -67,8 +68,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   timeFrame,
 }) => {
   const [{ data, error, fetching }] = useRankingQuery({
-    variables: { timeFrame, skip: 0, take: 3 },
+    variables: { timeFrame, skip: 0, take: 3, isMhp: true },
   });
+  const router = useRouter();
   if (error) console.log(error);
   if (fetching || !data?.ranking?.items || data.ranking.items.length === 0)
     return <></>;
@@ -81,8 +83,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   };
   const title = titles[timeFrame];
   return (
-    <Flex direction="column">
-      <Stack p={2}>
+    <Flex p={2} direction="column">
+      <Stack>
         <Flex mt={2} justifyContent="space-around" alignItems="center">
           <Text ml={4} fontSize="25px" textAlign="center">
             Leaderboards
@@ -91,7 +93,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
             <ChevronLeftIcon
               _hover={{ cursor: "pointer" }}
               onClick={() => {
-                setIndex((index - 1) % mod);
+                setIndex((index + mod - 1) % mod);
                 setUserCalled(true);
               }}
               size="15px"
@@ -114,7 +116,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
           <Leader key={rank.user.id} rank={rank} />
         ))}
       </Stack>
-      <Button>
+      <Button roundedTop={0} onClick={() => router.push("/user/rankings")}>
         <Image height="25px" src={BUCKET_BASE_URL + "/icons/rank.png"} />
         <Text ml={4}>View Rankings</Text>
       </Button>

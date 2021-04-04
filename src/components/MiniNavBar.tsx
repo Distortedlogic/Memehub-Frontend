@@ -56,7 +56,7 @@ export const MiniNavBar: React.FC<MiniNavBarProps> = () => {
                 p={2}
                 justifyContent="center"
                 alignItems="center"
-                onClick={() => router.push("/top-ratio/daily")}
+                onClick={() => router.push("/top/daily")}
               >
                 <Image
                   height="25px"
@@ -73,7 +73,7 @@ export const MiniNavBar: React.FC<MiniNavBarProps> = () => {
                 p={2}
                 justifyContent="center"
                 alignItems="center"
-                onClick={() => router.push("/top-ratio/weekly")}
+                onClick={() => router.push("/top/weekly")}
               >
                 <Image
                   height="25px"
@@ -90,7 +90,7 @@ export const MiniNavBar: React.FC<MiniNavBarProps> = () => {
                 p={2}
                 justifyContent="center"
                 alignItems="center"
-                onClick={() => router.push("/top-ratio/monthly")}
+                onClick={() => router.push("/top/monthly")}
               >
                 <Image
                   height="25px"
@@ -107,7 +107,7 @@ export const MiniNavBar: React.FC<MiniNavBarProps> = () => {
                 p={2}
                 justifyContent="center"
                 alignItems="center"
-                onClick={() => router.push("/top-ratio/ever")}
+                onClick={() => router.push("/top/ever")}
               >
                 <Image
                   height="25px"

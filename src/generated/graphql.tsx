@@ -34,6 +34,7 @@ export type Query = {
   currentRanks: Array<Rank>;
   ranking: PaginatedRanks;
   bestOfReddit: PaginatedRedditMemes;
+  marketHistory: Array<MarketData>;
   stonks: PaginatedStonks;
   positions: PaginatedPositions;
   history: PaginatedTrades;
@@ -127,6 +128,7 @@ export type QueryCurrentRanksArgs = {
 
 
 export type QueryRankingArgs = {
+  isMhp: Scalars['Boolean'];
   timeFrame: Scalars['String'];
   skip: Scalars['Int'];
   take: Scalars['Int'];
@@ -136,6 +138,12 @@ export type QueryRankingArgs = {
 export type QueryBestOfRedditArgs = {
   skip: Scalars['Int'];
   take: Scalars['Int'];
+};
+
+
+export type QueryMarketHistoryArgs = {
+  take: Scalars['Int'];
+  name: Scalars['String'];
 };
 
 
@@ -303,8 +311,10 @@ export type Rank = {
   userId: Scalars['String'];
   timeFrame: Scalars['String'];
   user: User;
-  rank: Scalars['Int'];
+  mhpRank: Scalars['Int'];
   mhp: Scalars['Int'];
+  gbpRank: Scalars['Int'];
+  gbp: Scalars['Int'];
 };
 
 export type Emoji = {
@@ -364,6 +374,14 @@ export type Redditor = {
   username: Scalars['String'];
 };
 
+export type MarketData = {
+  __typename?: 'MarketData';
+  price: Scalars['Float'];
+  marketcap: Scalars['Int'];
+  numPosts: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+};
+
 export type PaginatedStonks = {
   __typename?: 'PaginatedStonks';
   items: Array<Stonk>;
@@ -417,7 +435,7 @@ export type Mutation = {
   upVoteMeme: Meme;
   downVoteMeme: Meme;
   redisGet: Scalars['String'];
-  makeTrade: Trade;
+  makeTrade?: Maybe<Trade>;
   hiveLogin: UserResponse;
   login?: Maybe<UserResponse>;
   logout: Scalars['Boolean'];
@@ -976,7 +994,7 @@ export type TopRatedMemesQuery = (
 
 export type RankFragment = (
   { __typename?: 'Rank' }
-  & Pick<Rank, 'mhp' | 'rank' | 'timeFrame' | 'createdAt'>
+  & Pick<Rank, 'mhp' | 'mhpRank' | 'gbp' | 'gbpRank' | 'timeFrame' | 'createdAt'>
 );
 
 export type UserRankFragment = (
@@ -1020,6 +1038,7 @@ export type RankingQueryVariables = Exact<{
   timeFrame: Scalars['String'];
   take: Scalars['Int'];
   skip: Scalars['Int'];
+  isMhp: Scalars['Boolean'];
 }>;
 
 
@@ -1070,6 +1089,25 @@ export type RedisGetMutationVariables = Exact<{
 export type RedisGetMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'redisGet'>
+);
+
+export type MarketDataFragment = (
+  { __typename?: 'MarketData' }
+  & Pick<MarketData, 'numPosts' | 'price' | 'marketcap' | 'createdAt'>
+);
+
+export type MarketHistoryQueryVariables = Exact<{
+  take: Scalars['Int'];
+  name: Scalars['String'];
+}>;
+
+
+export type MarketHistoryQuery = (
+  { __typename?: 'Query' }
+  & { marketHistory: Array<(
+    { __typename?: 'MarketData' }
+    & MarketDataFragment
+  )> }
 );
 
 export type TemplateFragment = (
@@ -1154,10 +1192,10 @@ export type MakeTradeMutationVariables = Exact<{
 
 export type MakeTradeMutation = (
   { __typename?: 'Mutation' }
-  & { makeTrade: (
+  & { makeTrade?: Maybe<(
     { __typename?: 'Trade' }
     & TradeFragment
-  ) }
+  )> }
 );
 
 export type TradeHistoryQueryVariables = Exact<{
@@ -1438,7 +1476,9 @@ ${UserFragmentDoc}`;
 export const RankFragmentDoc = gql`
     fragment rank on Rank {
   mhp
-  rank
+  mhpRank
+  gbp
+  gbpRank
   timeFrame
   createdAt
 }
@@ -1465,6 +1505,14 @@ export const RedditMemeFragmentDoc = gql`
     id
     username
   }
+}
+    `;
+export const MarketDataFragmentDoc = gql`
+    fragment marketData on MarketData {
+  numPosts
+  price
+  marketcap
+  createdAt
 }
     `;
 export const TemplateFragmentDoc = gql`
@@ -1855,8 +1903,8 @@ export function useCurrentRanksQuery(options: Omit<Urql.UseQueryArgs<CurrentRank
   return Urql.useQuery<CurrentRanksQuery>({ query: CurrentRanksDocument, ...options });
 };
 export const RankingDocument = gql`
-    query Ranking($timeFrame: String!, $take: Int!, $skip: Int!) {
-  ranking(timeFrame: $timeFrame, take: $take, skip: $skip) {
+    query Ranking($timeFrame: String!, $take: Int!, $skip: Int!, $isMhp: Boolean!) {
+  ranking(timeFrame: $timeFrame, take: $take, skip: $skip, isMhp: $isMhp) {
     items {
       ...userRank
     }
@@ -1890,6 +1938,17 @@ export const RedisGetDocument = gql`
 
 export function useRedisGetMutation() {
   return Urql.useMutation<RedisGetMutation, RedisGetMutationVariables>(RedisGetDocument);
+};
+export const MarketHistoryDocument = gql`
+    query MarketHistory($take: Int!, $name: String!) {
+  marketHistory(take: $take, name: $name) {
+    ...marketData
+  }
+}
+    ${MarketDataFragmentDoc}`;
+
+export function useMarketHistoryQuery(options: Omit<Urql.UseQueryArgs<MarketHistoryQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<MarketHistoryQuery>({ query: MarketHistoryDocument, ...options });
 };
 export const StonksDocument = gql`
     query Stonks($take: Int!, $skip: Int!, $onlyPositions: Boolean!, $order: String!) {

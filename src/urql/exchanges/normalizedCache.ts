@@ -18,6 +18,7 @@ export const normalizedCache = cacheExchange({
     Rank: () => null,
     Emoji: () => null,
     Stonk: () => null,
+    MarketData: () => null,
   },
   resolvers: {
     Query: {

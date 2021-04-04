@@ -1,20 +1,20 @@
 import { Avatar, AvatarProps } from "@chakra-ui/react";
-import NextLink from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 
-type AvatarLinkProps = {
+interface AvatarLinkProps extends AvatarProps {
   userId: string;
-} & AvatarProps;
+}
 
 export const AvatarLink: React.FC<AvatarLinkProps> = (props) => {
-  const { userId, ...other } = props;
+  const { userId, ...avatarProps } = props;
+  const router = useRouter();
   return (
-    <NextLink href={`/user/${userId}`}>
-      <Avatar
-        _hover={{ cursor: "pointer" }}
-        border="1px solid white"
-        {...other}
-      />
-    </NextLink>
+    <Avatar
+      _hover={{ cursor: "pointer" }}
+      border="1px solid white"
+      onClcik={() => router.push(`/user/${userId}`)}
+      {...avatarProps}
+    />
   );
 };

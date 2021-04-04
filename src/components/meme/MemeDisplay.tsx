@@ -9,6 +9,7 @@ import { UserMemeFragment } from "src/generated/graphql";
 import { ratioToColorGrade } from "src/utils/functions";
 import { DownvoteButton } from "./DownvoteButton";
 import { HiveVoteButtons } from "./HiveVoteButtons";
+import { PeakdMemeLink } from "./PeakdLink";
 import { UpvoteButton } from "./UpvoteButton";
 dayjs.extend(relativeTime);
 
@@ -38,14 +39,13 @@ export const MemeDisplay: React.FC<MemeDisplayProps> = (props) => {
         align="center"
         py={1}
       >
-        <Flex justifyContent="space-around" align="center" rounded="md">
-          <Box mr={2}>
-            <AvatarLink
-              userId={meme.user.id}
-              size="md"
-              src={meme.user.avatar}
-            />
-          </Box>
+        <Flex justifyContent="space-around" alignItems="center">
+          <AvatarLink
+            mr={2}
+            userId={meme.user.id}
+            size="md"
+            src={meme.user.avatar}
+          />
           <Box>
             <Text fontSize="md" fontWeight="bold">
               {meme.user.username}
@@ -56,6 +56,7 @@ export const MemeDisplay: React.FC<MemeDisplayProps> = (props) => {
         <Text color={color} fontSize="50px" fontWeight="bold">
           {grade}
         </Text>
+        <PeakdMemeLink meme={meme} user={meme.user} imgHeight="40px" />
         <Flex justifyContent="center" alignItems="center">
           <UpvoteButton
             isLoading={isOpen}

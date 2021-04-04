@@ -20,6 +20,7 @@
     "@hiveio/dhive": "^0.14.12",
     "@nivo/bar": "^0.67.0",
     "@nivo/core": "^0.67.0",
+    "@nivo/line": "^0.67.0",
     "@urql/devtools": "^2.0.2",
     "@urql/exchange-graphcache": "^4.0.0",
     "@urql/exchange-request-policy": "^0.1.1",

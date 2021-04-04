@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@chakra-ui/popover";
+import { Table, Tbody, Td, Tr } from "@chakra-ui/table";
 import { useToast } from "@chakra-ui/toast";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
@@ -24,9 +25,14 @@ import { useMakeTradeMutation } from "../../generated/graphql";
 interface BuyButtonProps {
   name: string;
   price: number;
+  currentPosition: number;
 }
 
-export const BuyButton: React.FC<BuyButtonProps> = ({ name, price }) => {
+export const BuyButton: React.FC<BuyButtonProps> = ({
+  name,
+  price,
+  currentPosition,
+}) => {
   const [, makeTradeFN] = useMakeTradeMutation();
   const [{ data: meData, error }] = useMeQuery();
   const router = useRouter();
@@ -94,6 +100,35 @@ export const BuyButton: React.FC<BuyButtonProps> = ({ name, price }) => {
                       <NumberDecrementStepper />
                     </NumberInputStepper>
                   </NumberInput>
+                  <Table>
+                    <Tbody>
+                      <Tr>
+                        <Td>Balance</Td>
+                        <Td isNumeric>{meData?.me?.gbp} GBP</Td>
+                      </Tr>
+                      <Tr>
+                        <Td>Cost</Td>
+                        <Td isNumeric>{position * price} GBP</Td>
+                      </Tr>
+                      <Tr>
+                        <Td>New Balance</Td>
+                        <Td isNumeric>
+                          {meData?.me?.gbp
+                            ? meData.me.gbp - position * price
+                            : 0}{" "}
+                          GBP
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td>New Position</Td>
+                        <Td isNumeric>{currentPosition + position} GBP</Td>
+                      </Tr>
+                      <Tr>
+                        <Td>Current Position</Td>
+                        <Td isNumeric>{currentPosition} GBP</Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
                   <Button
                     isLoading={isSubmitting}
                     mt={2}
