@@ -54,12 +54,31 @@ export const Register: React.FC<RegisterProps> = ({}) => {
         {({ isSubmitting }) => (
           <Form>
             <Flex
-              h="80vh"
+              minHeight="80vh"
               direction="column"
               justifyContent="center"
               alignItems="center"
+              pb={6}
             >
               <Flex direction="column" w="60%">
+                <Button
+                  my={4}
+                  onClick={() => {
+                    router.push("/onboarding/newHiveAcct");
+                  }}
+                >
+                  Get a Hive Acct
+                </Button>
+                <Link
+                  _hover={{ cursor: "pointer" }}
+                  href="https://peakd.com/about/faq"
+                  target="_blank"
+                >
+                  <Flex justifyContent="center" alignContent="center ">
+                    <Text>What is Hive?</Text>
+                  </Flex>
+                </Link>
+                <Divider mt={4} />
                 <Box mt={4}>
                   <InputField
                     name="username"
@@ -107,25 +126,6 @@ export const Register: React.FC<RegisterProps> = ({}) => {
                 <Button mb={2} mt={4} type="submit" isLoading={isSubmitting}>
                   Register with Memehub
                 </Button>
-                <Divider />
-                <Button
-                  mb={2}
-                  mt={2}
-                  onClick={() => {
-                    router.push("/onboarding/newHiveAcct");
-                  }}
-                >
-                  Get a Hive Acct
-                </Button>
-                <Link
-                  _hover={{ cursor: "pointer" }}
-                  href="https://peakd.com/about/faq"
-                  target="_blank"
-                >
-                  <Flex justifyContent="center" alignContent="center ">
-                    <Text>What is Hive?</Text>
-                  </Flex>
-                </Link>
               </Flex>
             </Flex>
           </Form>

@@ -1,10 +1,10 @@
-import { Text } from "@chakra-ui/layout";
+import { Flex } from "@chakra-ui/layout";
 import { withUrqlClient } from "next-urql";
 import React, { useState } from "react";
 import { MemeGrid } from "src/components/meme/MemeGrid";
 import { useHotMemesQuery } from "src/generated/graphql";
 import { urqlClient } from "src/urql/urqlClient";
-import { SingleColLayout } from "./_singleColLayout";
+import { DoubleColLayout } from "./_doubleColLayout";
 
 interface HotProps {}
 const take = 8;
@@ -19,16 +19,16 @@ const Hot: React.FC<HotProps> = ({}) => {
   }
   if (!data?.hotMemes || fetching) {
     return (
-      <SingleColLayout>
-        <Text>Loading ...</Text>
-      </SingleColLayout>
+      <DoubleColLayout>
+        <Flex h="80vh"></Flex>
+      </DoubleColLayout>
     );
   } else {
     const { hasMore, items: memes } = data.hotMemes;
     return (
-      <SingleColLayout>
+      <DoubleColLayout>
         <MemeGrid pagedMemes={memes} hasMore={hasMore} loadMore={loadMore} />
-      </SingleColLayout>
+      </DoubleColLayout>
     );
   }
 };

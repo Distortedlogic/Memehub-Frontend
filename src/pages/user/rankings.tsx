@@ -23,28 +23,28 @@ const Rankings: React.FC<RankingsProps> = () => {
         >
           <Button
             onClick={() => setTD("day")}
-            variantColor={timeFrame === "day" ? "blue" : "gray"}
+            colorScheme={timeFrame === "day" ? "blue" : "gray"}
             mx={2}
           >
             Daily
           </Button>
           <Button
             onClick={() => setTD("week")}
-            variantColor={timeFrame === "week" ? "blue" : "gray"}
+            colorScheme={timeFrame === "week" ? "blue" : "gray"}
             mx={2}
           >
             Weekly
           </Button>
           <Button
             onClick={() => setTD("month")}
-            variantColor={timeFrame === "month" ? "blue" : "gray"}
+            colorScheme={timeFrame === "month" ? "blue" : "gray"}
             mx={2}
           >
             Monthly
           </Button>
           <Button
             onClick={() => setTD("ever")}
-            variantColor={timeFrame === "ever" ? "blue" : "gray"}
+            colorScheme={timeFrame === "ever" ? "blue" : "gray"}
             mx={2}
           >
             Ever

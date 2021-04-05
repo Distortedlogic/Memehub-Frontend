@@ -1,0 +1,30 @@
+version: 2.1
+jobs:
+  build-and-deploy:
+    docker:
+      - image: node:latest
+    working_directory: ~/frontend
+    steps:
+      - checkout:
+          path: ~/frontend
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{checksum "package.json"}}
+            - v1-dependencies-
+      - run: npm i
+      - run: npm i -g vercel@latest
+      - save_cache:
+          paths:
+            - node_modules
+            - ./.next/cache
+          key: v1-dependencies-{{checksum "package.json"}}
+      - run: npm run build
+      - run: vercel --prod --token $VERCEL_TOKEN --confirm
+workflows:
+  build:
+    jobs:
+      - build-and-deploy:
+          filters:
+            branches:
+              only:
+                - master

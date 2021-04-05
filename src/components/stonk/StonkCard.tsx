@@ -1,23 +1,23 @@
 import { Image } from "@chakra-ui/image";
-import { BoxProps, Flex, Text } from "@chakra-ui/layout";
+import { Flex, FlexProps, Text } from "@chakra-ui/layout";
 import React from "react";
 import { StonkFragment } from "src/generated/graphql";
 import { BuyButton } from "./BuyButton";
 import { SellButton } from "./SellButton";
 
-interface StonkCardProps extends BoxProps {
+interface StonkCardProps extends FlexProps {
   stonk: StonkFragment;
 }
 
 export const StonkCard: React.FC<StonkCardProps> = (props) => {
-  let { stonk } = props;
+  let { stonk, ...flexProps } = props;
   return (
     <Flex
-      {...props}
       justifyContent="space-between"
       alignItems="center"
       p={4}
-      rounded="md"
+      w="100%"
+      {...flexProps}
     >
       <Flex
         _hover={{ cursor: "pointer" }}

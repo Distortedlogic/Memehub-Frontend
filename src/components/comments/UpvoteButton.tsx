@@ -31,7 +31,7 @@ export const UpvoteButton: React.FC<UpvoteButtonProps> = (props) => {
   const { me } = data;
   const hasVoted = useHasVoted(comment);
   const handleUpvote = async () => {
-    if (!hasVoted) {
+    if (!hasVoted()) {
       if (
         me?.isHive &&
         comment.isHive &&

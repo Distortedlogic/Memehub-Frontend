@@ -1,7 +1,6 @@
 import { Box, Divider, Flex, Grid } from "@chakra-ui/layout";
 import React, { Fragment } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { endMessage } from "src/components/utils/endMessage";
 import { loader } from "src/components/utils/loader";
 import {
   MemeFragment,
@@ -9,6 +8,7 @@ import {
   UserMemeFragment,
 } from "src/generated/graphql";
 import { useStoreState } from "src/store/store";
+import { endMessage } from "../utils/endMessage";
 import { ScrollToTop } from "../utils/ScrollToTop";
 import { MemeBox } from "./MemeBox";
 import { MemeCard } from "./MemeCard";

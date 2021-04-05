@@ -31,7 +31,7 @@ export const DoubleColLayout: React.FC<DoubleColLayoutProps> = (props) => {
         <GridItem>{props.children}</GridItem>
         <GridItem mr={2} position="sticky" top="0">
           <HiveTicker />
-          <Leaderboards />
+          <Leaderboards position="sticky" top="20vh" />
         </GridItem>
       </Grid>
     </>

@@ -27,7 +27,7 @@ export const UpvoteButton: React.FC<UpvoteButtonProps> = (props) => {
   const { me } = data;
   const hasVoted = useHasVoted(meme);
   const handleUpvote = async () => {
-    if (!hasVoted) {
+    if (!hasVoted()) {
       if (
         me?.isHive &&
         meme.isHive &&
@@ -47,7 +47,7 @@ export const UpvoteButton: React.FC<UpvoteButtonProps> = (props) => {
       isActive={meme.hasUpvoted}
       isLoading={upFetching || isLoading}
       colorScheme={meme.hasUpvoted ? "green" : "gray"}
-      onClick={() => handleUpvote()}
+      onClick={async () => await handleUpvote()}
       {...buttonprops}
     >
       <ArrowUpIcon color={meme.hasUpvoted ? "white" : "green.500"} />

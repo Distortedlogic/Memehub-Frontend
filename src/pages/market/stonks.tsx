@@ -40,7 +40,7 @@ const Stonks: React.FC<StonksProps> = () => {
             </Checkbox>
           </Flex>
           <HiveTicker />
-          <Leaderboards />
+          <Leaderboards position="sticky" top="20vh" />
         </GridItem>
       </Grid>
     </NavLayout>

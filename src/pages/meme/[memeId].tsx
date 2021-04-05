@@ -1,4 +1,4 @@
-import { Flex, Text } from "@chakra-ui/layout";
+import { Flex } from "@chakra-ui/layout";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
@@ -9,7 +9,6 @@ import { useMemeQuery } from "src/generated/graphql";
 import { urqlClient } from "src/urql/urqlClient";
 import { ssr } from "src/utils/constants";
 import { DoubleColLayout } from "../_doubleColLayout";
-import { SingleColLayout } from "../_singleColLayout";
 
 interface MemeProps {}
 
@@ -25,9 +24,9 @@ const Meme: React.FC<MemeProps> = ({}) => {
   const [{ data, fetching }] = useMemeQuery({ pause, variables });
   if (fetching || !data?.meme) {
     return (
-      <SingleColLayout>
-        <Text>Loading ..</Text>
-      </SingleColLayout>
+      <DoubleColLayout>
+        <Flex h="80vh"></Flex>
+      </DoubleColLayout>
     );
   }
   return (

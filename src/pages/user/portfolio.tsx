@@ -22,9 +22,9 @@ const portfolio: React.FC<portfolioProps> = () => {
   return (
     <DoubleColLayout>
       <Flex mb={4} pl={6} minHeight="80vh" direction="column">
-        <Positions maxHeight="80vh" overflow="auto" userId={me.id} />
+        <Positions maxHeight="60vh" overflow="auto" userId={me.id} />
         <Divider my={4} />
-        <TradeHistory maxHeight="80vh" overflow="auto" userId={me.id} />
+        <TradeHistory maxHeight="60vh" overflow="auto" userId={me.id} />
       </Flex>
     </DoubleColLayout>
   );

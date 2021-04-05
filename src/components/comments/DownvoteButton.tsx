@@ -24,7 +24,7 @@ export const DownvoteButton: React.FC<DownvoteButtonProps> = (props) => {
   ] = useDownVoteCommentMutation();
   const hasVoted = useHasVoted(comment);
   const handleDownvote = async () => {
-    if (!hasVoted) {
+    if (!hasVoted()) {
       const { data } = await downVoteMemeFN({ commentId: comment.id });
       if (data?.downVoteComment) {
         toast({ title: "Downvote Sent", status: "success" });

@@ -9,7 +9,6 @@ import {
   Stack,
   Text,
   Tooltip,
-  useToast,
 } from "@chakra-ui/react";
 import { ResponsiveBar } from "@nivo/bar";
 import dayjs from "dayjs";
@@ -18,22 +17,21 @@ import Humanize from "humanize-plus";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { endMessage } from "src/components/utils/endMessage";
 import { loader } from "src/components/utils/loader";
-import { VoteButton } from "src/components/utils/VoteButton";
 import {
   CommentFragment,
   useCurrentRanksQuery,
-  useDownVoteCommentMutation,
   UserFragment,
-  useUpVoteCommentMutation,
   useUserCommentsQuery,
   useUserMemesQuery,
   useUserRanksQuery,
 } from "src/generated/graphql";
 import { DoubleColLayout } from "src/pages/_doubleColLayout";
 import { capitalizeFirstLetter, ratioToColorGrade } from "src/utils/functions";
+import { DownvoteButton } from "../comments/DownvoteButton";
+import { UpvoteButton } from "../comments/UpvoteButton";
 import { MemeGrid } from "../meme/MemeGrid";
+import { endMessage } from "../utils/endMessage";
 dayjs.extend(relativeTime);
 const take = 16;
 interface ProfileProps {
@@ -75,19 +73,41 @@ export const Profile: React.FC<ProfileProps> = ({ user }) => {
         </Flex>
         <Flex justifyContent="space-around">
           <Flex>
-            <Button mr={4} onClick={() => setIsMemes(true)}>
+            <Button
+              mr={4}
+              colorScheme={isMemes ? "blue" : "gray"}
+              onClick={() => setIsMemes(true)}
+            >
               Memes
             </Button>
-            <Button onClick={() => setIsMemes(false)}>comments</Button>
+            <Button
+              colorScheme={!isMemes ? "blue" : "gray"}
+              onClick={() => setIsMemes(false)}
+            >
+              comments
+            </Button>
           </Flex>
           <Flex>
-            <Button onClick={() => setOrder("ratio")} mr={4}>
+            <Button
+              colorScheme={order === "ratio" ? "blue" : "gray"}
+              onClick={() => setOrder("ratio")}
+              mr={4}
+            >
               Top Ratio
             </Button>
-            <Button onClick={() => setOrder("upvoted")} mr={4}>
+            <Button
+              colorScheme={order === "upvoted" ? "blue" : "gray"}
+              onClick={() => setOrder("upvoted")}
+              mr={4}
+            >
               Top Upvoted
             </Button>
-            <Button onClick={() => setOrder("new")}>New</Button>
+            <Button
+              colorScheme={order === "new" ? "blue" : "gray"}
+              onClick={() => setOrder("new")}
+            >
+              New
+            </Button>
           </Flex>
         </Flex>
         {isMemes ? (
@@ -113,7 +133,7 @@ const Memes: React.FC<MemesProps> = ({ user, order }) => {
   const loadMore = () => setSkip(skip + take);
   if (error) console.log("error", error);
   if (!data || fetching || !data.userMemes) {
-    return <></>;
+    return <Flex minHieght="25vh"></Flex>;
   }
   const { hasMore, items: memes } = data.userMemes;
   return (
@@ -143,7 +163,7 @@ export const Comments: React.FC<CommentsProps> = ({ order, userId }) => {
     },
   });
   if (fetching || !data?.userComments) {
-    return <></>;
+    return <Flex minHeight="40vh"></Flex>;
   }
   const { items: comments, hasMore } = data.userComments;
   return (
@@ -154,7 +174,7 @@ export const Comments: React.FC<CommentsProps> = ({ order, userId }) => {
       loader={loader}
       endMessage={endMessage}
     >
-      <Stack py={6} px={12}>
+      <Stack minHeight="25vh" py={6} px={12}>
         {comments.map((comment) => (
           <>
             <CommentBox key={comment.id} comment={comment} />
@@ -173,44 +193,6 @@ type CommentBoxProps = BoxProps & {
 export const CommentBox: React.FC<CommentBoxProps> = (props) => {
   let { comment } = props;
   const router = useRouter();
-  const [
-    { fetching: upFetching },
-    upVoteCommentFN,
-  ] = useUpVoteCommentMutation();
-  const [
-    { fetching: downFetching },
-    downVoteCommentFN,
-  ] = useDownVoteCommentMutation();
-  const toast = useToast();
-  const hasVoted = () => {
-    if (comment.hasUpvoted || comment.hasDownvoted) {
-      toast({
-        title: "Oops",
-        description: "You already voted this comment",
-        status: "warning",
-        duration: 3000,
-        isClosable: true,
-      });
-      return true;
-    } else {
-      return false;
-    }
-  };
-  const handleUpvote = async () => {
-    if (!hasVoted()) {
-      const { data, error } = await upVoteCommentFN({ commentId: comment.id });
-      if (error) console.log("errror", error);
-      if (data?.upVoteComment) {
-        comment = data?.upVoteComment;
-      }
-    }
-  };
-  const handleDownvote = async () => {
-    if (!hasVoted()) {
-      const { data } = await downVoteCommentFN({ commentId: comment.id });
-      if (data?.downVoteComment) comment = data?.downVoteComment;
-    }
-  };
   const { grade, color } = ratioToColorGrade(comment.ratio);
   return (
     <Flex
@@ -238,27 +220,17 @@ export const CommentBox: React.FC<CommentBoxProps> = (props) => {
         justifyContent="space-around"
         alignItems="center"
       >
-        <VoteButton
-          upvote
-          numVotes={comment.ups}
-          hasVoted={comment.hasUpvoted}
-          handleVote={handleUpvote}
-          fetching={upFetching}
-          size="md"
+        <UpvoteButton
+          comment={comment}
+          toggleHiveVote={() => {}}
+          isOpen={false}
         />
         <Flex justifyContent="space-around">
           <Text color={color} fontSize="15px" fontWeight="bold" m={1}>
             {grade}
           </Text>
         </Flex>
-        <VoteButton
-          downvote
-          numVotes={comment.downs}
-          hasVoted={comment.hasDownvoted}
-          handleVote={handleDownvote}
-          fetching={downFetching}
-          size="md"
-        />
+        <DownvoteButton comment={comment} isOpen={false} />
       </Flex>
     </Flex>
   );
