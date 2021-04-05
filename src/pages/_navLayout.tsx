@@ -29,3 +29,4 @@ export const NavLayout: React.FC<NavLayoutProps> = (props) => {
     </>
   );
 };
+export default NavLayout;

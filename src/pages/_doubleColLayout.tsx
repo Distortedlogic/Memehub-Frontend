@@ -39,3 +39,4 @@ export const DoubleColLayout: React.FC<DoubleColLayoutProps> = (props) => {
     </>
   );
 };
+export default DoubleColLayout;

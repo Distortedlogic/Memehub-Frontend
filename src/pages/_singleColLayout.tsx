@@ -31,3 +31,4 @@ export const SingleColLayout: React.FC<SingleColLayoutProps> = (props) => {
     </>
   );
 };
+export default SingleColLayout;
