@@ -12,7 +12,7 @@ export const NavLayout: React.FC<NavLayoutProps> = (props) => {
     <>
       <Grid
         position="sticky"
-        zIndex={1000}
+        zIndex={100}
         top={0}
         w="100%"
         templateRows="10vh 10vh"

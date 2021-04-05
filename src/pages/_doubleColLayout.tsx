@@ -1,4 +1,4 @@
-import { Grid, GridItem } from "@chakra-ui/react";
+import { Flex, Grid, GridItem } from "@chakra-ui/react";
 import React from "react";
 import { MiniNavBar } from "src/components/MiniNavBar";
 import { NavBar } from "src/components/NavBar";
@@ -14,7 +14,7 @@ export const DoubleColLayout: React.FC<DoubleColLayoutProps> = (props) => {
     <>
       <Grid
         position="sticky"
-        zIndex={1000}
+        zIndex={100}
         top={0}
         w="100%"
         templateRows="10vh 10vh"
@@ -29,9 +29,11 @@ export const DoubleColLayout: React.FC<DoubleColLayoutProps> = (props) => {
       </Grid>
       <Grid templateColumns="3fr 1fr" w="100%" backgroundColor="black">
         <GridItem>{props.children}</GridItem>
-        <GridItem mr={2} position="sticky" top="0">
-          <HiveTicker />
-          <Leaderboards position="sticky" top="20vh" />
+        <GridItem>
+          <Flex position="sticky" top="20vh" mr={2} direction="column">
+            <HiveTicker />
+            <Leaderboards />
+          </Flex>
         </GridItem>
       </Grid>
     </>

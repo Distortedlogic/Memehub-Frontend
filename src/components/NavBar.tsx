@@ -47,15 +47,20 @@ export const NavBar: React.FC<NavBarProps> = () => {
         </NextLink>
       </Flex>
       <Flex>
-        <InputGroup>
-          <Input
-            border="none"
-            rounded="none"
-            borderBottom="1px solid gray"
-            placeholder="search..."
-          />
-          <InputRightElement pointerEvents="none" children={<Search2Icon />} />
-        </InputGroup>
+        <Tooltip label="I Dont Work Yet :(">
+          <InputGroup>
+            <Input
+              border="none"
+              rounded="none"
+              borderBottom="1px solid gray"
+              placeholder="search..."
+            />
+            <InputRightElement
+              pointerEvents="none"
+              children={<Search2Icon />}
+            />
+          </InputGroup>
+        </Tooltip>
       </Flex>
       <Flex justifyContent="center" alignItems="center">
         <Link

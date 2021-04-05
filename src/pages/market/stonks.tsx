@@ -39,8 +39,10 @@ const Stonks: React.FC<StonksProps> = () => {
               <Text>Show Positions</Text>
             </Checkbox>
           </Flex>
-          <HiveTicker />
-          <Leaderboards position="sticky" top="20vh" />
+          <Flex position="sticky" top="20vh" direction="column">
+            <HiveTicker />
+            <Leaderboards />
+          </Flex>
         </GridItem>
       </Grid>
     </NavLayout>

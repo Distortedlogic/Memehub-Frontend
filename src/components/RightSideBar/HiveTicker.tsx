@@ -1,10 +1,10 @@
-import { Flex, Link, Text } from "@chakra-ui/react";
+import { Flex, FlexProps, Link, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useAsyncEffect } from "use-async-effect";
 
-interface HiveTickerProps {}
+interface HiveTickerProps extends FlexProps {}
 
-export const HiveTicker: React.FC<HiveTickerProps> = () => {
+export const HiveTicker: React.FC<HiveTickerProps> = (flexProps) => {
   const [hivePrice, setHivePrice] = useState(0);
   const [hbdPrice, setHbdPrice] = useState(0);
   const [reload, setReload] = useState(false);
@@ -44,7 +44,7 @@ export const HiveTicker: React.FC<HiveTickerProps> = () => {
       justifyContent="space-around"
       alignItems="center"
       backgroundColor="black"
-      rounded="md"
+      {...flexProps}
     >
       <Link
         _hover={{ cursor: "pointer" }}

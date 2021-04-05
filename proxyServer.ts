@@ -2,7 +2,7 @@ import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import next from "next";
 
-const port = 3001;
+const port = 3000;
 const dev = process.env.ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
