@@ -111,7 +111,9 @@ export const Profile: React.FC<ProfileProps> = ({ user }) => {
           </Flex>
         </Flex>
         {isMemes ? (
-          <Memes user={user} order={order} />
+          <Flex justifyContent="center" alignItems="center">
+            <Memes user={user} order={order} />
+          </Flex>
         ) : (
           <Comments userId={user.id} order={order} />
         )}

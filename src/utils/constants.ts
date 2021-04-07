@@ -16,3 +16,4 @@ export const isServer = () => typeof window === "undefined";
 export const isBrowser = () => typeof window !== "undefined";
 
 export const canUseKeychain = () => isBrowser() && window.hive_keychain;
+export const ADMIN_NAME = __prod__ ? "memehub" : "memehub.bot";

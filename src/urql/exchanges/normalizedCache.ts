@@ -1,10 +1,10 @@
 import { cacheExchange } from "@urql/exchange-graphcache";
 import { register } from "../cache/register";
+import { resetMemes } from "../cache/resetMemes";
 import { Pagination } from "../cache/utils/pagination";
 import { hiveLogin } from "./../cache/login";
 import { logout } from "./../cache/logout";
-import { postComment } from "./../cache/postComment";
-import { postMeme } from "./../cache/postMeme";
+import { resetComments } from "./../cache/resetComments";
 
 export const normalizedCache = cacheExchange({
   keys: {
@@ -37,8 +37,9 @@ export const normalizedCache = cacheExchange({
       logout,
       hiveLogin,
       register,
-      postMeme,
-      postComment,
+      postMeme: resetMemes,
+      deleteMeme: resetMemes,
+      postComment: resetComments,
     },
   },
 });

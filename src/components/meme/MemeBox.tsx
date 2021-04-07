@@ -10,25 +10,28 @@ import Humanize from "humanize-plus";
 import { useRouter } from "next/router";
 import React from "react";
 import { AvatarLink } from "src/components/utils/AvatarLink";
-import { MemeFragment, UserFragment } from "src/generated/graphql";
+import { MemeFragment, useMeQuery, UserFragment } from "src/generated/graphql";
+import { useStoreState } from "src/store/store";
+import { ADMIN_NAME } from "src/utils/constants";
 import { ratioToColorGrade } from "src/utils/functions";
+import { DeleteButton } from "./DeleteButton";
 import { DownvoteButton } from "./DownvoteButton";
 import { HiveVoteButtons } from "./HiveVoteButtons";
 import { PeakdMemeLink } from "./PeakdLink";
 import { UpvoteButton } from "./UpvoteButton";
 dayjs.extend(relativeTime);
 
-type MemeProps = Partial<BoxProps> & {
+interface MemeProps extends BoxProps {
   topfull: boolean;
   meme: MemeFragment;
   user: UserFragment;
-};
+}
 
 export const MemeBox: React.FC<MemeProps> = (props) => {
   let { meme, user, topfull, ...boxprops } = props;
   const router = useRouter();
   return (
-    <Box {...boxprops} p={6} rounded="md" backgroundColor="black">
+    <Flex direction="column" {...boxprops} p={6}>
       <TopBar meme={meme} user={user} topfull={topfull} />
       <Flex
         _hover={{ cursor: "pointer" }}
@@ -42,7 +45,7 @@ export const MemeBox: React.FC<MemeProps> = (props) => {
         <Image rounded="md" w="auto" src={meme.url} />
       </Flex>
       <BottomBar user={user} meme={meme} />
-    </Box>
+    </Flex>
   );
 };
 
@@ -53,6 +56,9 @@ interface TopBarProps {
 }
 
 const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
+  const {
+    settings: { gridView },
+  } = useStoreState((state) => state);
   const hiveBadge = user.isHive ? (
     <Badge ml="2" colorScheme="red">
       Hive
@@ -85,17 +91,29 @@ const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
   );
 
   if (topfull) {
-    return (
-      <Flex direction="column">
-        <Flex mb={4} justifyContent="space-between">
+    if (gridView === "grid") {
+      return (
+        <Flex alignItems="center" direction="column">
           {topBar}
-          <Text fontSize="sm" mx={2}>
+          <Text mt={2} fontSize="sm">
             {dayjs(meme.createdAt).fromNow()}
           </Text>
+          <Text textAlign="center">{ellipsize(meme.title, 40)}</Text>
         </Flex>
-        <Text textAlign="center">{ellipsize(meme.title, 40)}</Text>
-      </Flex>
-    );
+      );
+    } else {
+      return (
+        <Flex direction="column">
+          <Flex mb={4} justifyContent="space-between">
+            {topBar}
+            <Text fontSize="sm" mx={2}>
+              {dayjs(meme.createdAt).fromNow()}
+            </Text>
+          </Flex>
+          <Text textAlign="center">{ellipsize(meme.title, 40)}</Text>
+        </Flex>
+      );
+    }
   } else {
     return (
       <Flex mb={4} justifyContent="space-between">
@@ -119,9 +137,17 @@ export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
   const { grade, color } = ratioToColorGrade(meme.ratio);
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
+  const [{ data, fetching, error }] = useMeQuery();
+  const canDelete =
+    !error &&
+    !fetching &&
+    data?.me &&
+    (meme.userId === data.me.id || data.me.username === ADMIN_NAME) &&
+    !meme.isHive;
   return (
     <>
       <Flex mt={2} justifyContent="center" align="center">
+        {canDelete ? <DeleteButton meme={meme} /> : null}
         <DownvoteButton isLoading={isOpen} size="sm" meme={meme} />
         <Button size="sm" m={1} onClick={() => router.push(`/meme/${meme.id}`)}>
           <FontAwesomeIcon icon="comment-alt" size="lg" />

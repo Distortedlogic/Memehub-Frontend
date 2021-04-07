@@ -27,7 +27,9 @@ const Hot: React.FC<HotProps> = ({}) => {
     const { hasMore, items: memes } = data.hotMemes;
     return (
       <DoubleColLayout>
-        <MemeGrid pagedMemes={memes} hasMore={hasMore} loadMore={loadMore} />
+        <Flex justifyContent="center" alignItems="center" minHeight="80vh">
+          <MemeGrid pagedMemes={memes} hasMore={hasMore} loadMore={loadMore} />
+        </Flex>
       </DoubleColLayout>
     );
   }

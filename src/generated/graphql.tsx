@@ -34,7 +34,7 @@ export type Query = {
   currentRanks: Array<Rank>;
   ranking: PaginatedRanks;
   bestOfReddit: PaginatedRedditMemes;
-  marketHistory: Array<MarketData>;
+  marketHistory: PaginatedMarketData;
   stonks: PaginatedStonks;
   positions: PaginatedPositions;
   history: PaginatedTrades;
@@ -372,6 +372,12 @@ export type Redditor = {
   __typename?: 'Redditor';
   id: Scalars['Int'];
   username: Scalars['String'];
+};
+
+export type PaginatedMarketData = {
+  __typename?: 'PaginatedMarketData';
+  items: Array<MarketData>;
+  hasMore: Scalars['Boolean'];
 };
 
 export type MarketData = {
@@ -801,7 +807,7 @@ export type MyMemeFragment = (
 
 export type MemeFragment = (
   { __typename?: 'Meme' }
-  & Pick<Meme, 'hasUpvoted' | 'hasDownvoted'>
+  & Pick<Meme, 'userId' | 'hasUpvoted' | 'hasDownvoted'>
   & MyMemeFragment
 );
 
@@ -1104,15 +1110,14 @@ export type MarketHistoryQueryVariables = Exact<{
 
 export type MarketHistoryQuery = (
   { __typename?: 'Query' }
-  & { marketHistory: Array<(
-    { __typename?: 'MarketData' }
-    & MarketDataFragment
-  )> }
-);
-
-export type TemplateFragment = (
-  { __typename?: 'Template' }
-  & Pick<Template, 'name' | 'url'>
+  & { marketHistory: (
+    { __typename?: 'PaginatedMarketData' }
+    & Pick<PaginatedMarketData, 'hasMore'>
+    & { items: Array<(
+      { __typename?: 'MarketData' }
+      & MarketDataFragment
+    )> }
+  ) }
 );
 
 export type StonkFragment = (
@@ -1138,6 +1143,11 @@ export type StonksQuery = (
       & StonkFragment
     )> }
   ) }
+);
+
+export type TemplateFragment = (
+  { __typename?: 'Template' }
+  & Pick<Template, 'name' | 'url'>
 );
 
 export type PositionFragment = (
@@ -1460,6 +1470,7 @@ export const MyMemeFragmentDoc = gql`
 export const MemeFragmentDoc = gql`
     fragment meme on Meme {
   ...myMeme
+  userId
   hasUpvoted
   hasDownvoted
 }
@@ -1515,12 +1526,6 @@ export const MarketDataFragmentDoc = gql`
   createdAt
 }
     `;
-export const TemplateFragmentDoc = gql`
-    fragment template on Template {
-  name
-  url
-}
-    `;
 export const StonkFragmentDoc = gql`
     fragment stonk on Stonk {
   name
@@ -1529,6 +1534,12 @@ export const StonkFragmentDoc = gql`
   marketcap
   numPosts
   position
+}
+    `;
+export const TemplateFragmentDoc = gql`
+    fragment template on Template {
+  name
+  url
 }
     `;
 export const PositionFragmentDoc = gql`
@@ -1942,7 +1953,10 @@ export function useRedisGetMutation() {
 export const MarketHistoryDocument = gql`
     query MarketHistory($take: Int!, $name: String!) {
   marketHistory(take: $take, name: $name) {
-    ...marketData
+    items {
+      ...marketData
+    }
+    hasMore
   }
 }
     ${MarketDataFragmentDoc}`;

@@ -11,8 +11,10 @@ import {
   Text,
   Th,
   Thead,
+  Tooltip,
   Tr,
 } from "@chakra-ui/react";
+import Humanize from "humanize-plus";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useRankingQuery } from "src/generated/graphql";
@@ -87,7 +89,7 @@ const Leaderboard: React.FC<LeaderboardProps> = (props) => {
   };
   const title = titles[timeFrame];
   return (
-    <Flex p={2} direction="column" {...flexProps}>
+    <Flex p={2} maxWidth="100%" direction="column" {...flexProps}>
       <Text textAlign="center" fontSize="20px">
         Leaderboards
       </Text>
@@ -140,7 +142,13 @@ const Leaderboard: React.FC<LeaderboardProps> = (props) => {
                 </Flex>
               </Td>
               <Td>
-                <Text textAlign="center">{isMhp ? rank.mhp : rank.gbp}</Text>
+                <Tooltip label={`${isMhp ? rank.mhp : rank.gbp}`}>
+                  <Text textAlign="center">
+                    {isMhp
+                      ? Humanize.compactInteger(rank.mhp)
+                      : Humanize.compactInteger(rank.gbp)}
+                  </Text>
+                </Tooltip>
               </Td>
             </Tr>
           ))}
