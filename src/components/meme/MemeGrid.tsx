@@ -147,6 +147,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
   const [{ data: meData, fetching: meFetching, error: meError }] = useMeQuery();
   const [
     { data: MemeEmojisData, error: MemeEmojisError },
+    refetch,
   ] = useMemeEmojisQuery({ variables: { memeId: meme.id } });
   if (MemeEmojisError) console.log(MemeEmojisError);
   const emojis = MemeEmojisData?.memeEmojis.map((data) => (
@@ -191,7 +192,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
         <Button m={1} size="sm">
           <Text color={color}>{grade}</Text>
         </Button>
-        <AddEmoji m={1} memeId={meme.id} />
+        <AddEmoji refetch={refetch} m={1} memeId={meme.id} />
       </Flex>
       <Flex justifyContent="center" alignItems="center">
         {emojis}
