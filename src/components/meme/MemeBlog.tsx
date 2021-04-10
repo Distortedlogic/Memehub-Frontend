@@ -10,29 +10,36 @@ import Humanize from "humanize-plus";
 import { useRouter } from "next/router";
 import React from "react";
 import { AvatarLink } from "src/components/utils/AvatarLink";
-import { MemeFragment, useMeQuery, UserFragment } from "src/generated/graphql";
+import {
+  MemeFragment,
+  useMemeEmojisQuery,
+  useMeQuery,
+  UserFragment,
+} from "src/generated/graphql";
 import { useStoreState } from "src/store/store";
 import { ADMIN_NAME } from "src/utils/constants";
 import { ratioToColorGrade } from "src/utils/functions";
-import { DeleteButton } from "./DeleteButton";
-import { DownvoteButton } from "./DownvoteButton";
-import { HiveVoteButtons } from "./HiveVoteButtons";
-import { PeakdMemeLink } from "./PeakdLink";
-import { UpvoteButton } from "./UpvoteButton";
+import { AddEmoji } from "../emojis/AddEmoji";
+import { EmojiButton } from "../emojis/EmojiButton";
+import { DeleteButton } from "./utils/DeleteButton";
+import { DownvoteButton } from "./utils/DownvoteButton";
+import { HiveVoteButtons } from "./utils/HiveVoteButtons";
+import { PeakdMemeLink } from "./utils/PeakdLink";
+import { UpvoteButton } from "./utils/UpvoteButton";
 dayjs.extend(relativeTime);
 
-interface MemeProps extends BoxProps {
-  topfull: boolean;
+interface MemeBlogProps extends BoxProps {
+  displayUser: boolean;
   meme: MemeFragment;
   user: UserFragment;
 }
 
-export const MemeBox: React.FC<MemeProps> = (props) => {
-  let { meme, user, topfull, ...boxprops } = props;
+export const MemeBlog: React.FC<MemeBlogProps> = (props) => {
+  let { meme, user, displayUser, ...boxprops } = props;
   const router = useRouter();
   return (
     <Flex direction="column" {...boxprops} p={6}>
-      <TopBar meme={meme} user={user} topfull={topfull} />
+      <TopBar meme={meme} user={user} displayUser={displayUser} />
       <Flex
         _hover={{ cursor: "pointer" }}
         onClick={() => {
@@ -50,12 +57,12 @@ export const MemeBox: React.FC<MemeProps> = (props) => {
 };
 
 interface TopBarProps {
-  topfull: boolean;
+  displayUser: boolean;
   meme: MemeFragment;
   user: UserFragment;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
+const TopBar: React.FC<TopBarProps> = ({ user, meme, displayUser }) => {
   const {
     settings: { gridView },
   } = useStoreState((state) => state);
@@ -90,7 +97,7 @@ const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
     </Flex>
   );
 
-  if (topfull) {
+  if (displayUser) {
     if (gridView === "grid") {
       return (
         <Flex alignItems="center" direction="column">
@@ -137,17 +144,24 @@ export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
   const { grade, color } = ratioToColorGrade(meme.ratio);
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
-  const [{ data, fetching, error }] = useMeQuery();
+  const [{ data: meData, fetching: meFetching, error: meError }] = useMeQuery();
+  const [
+    { data: MemeEmojisData, error: MemeEmojisError },
+    refetch,
+  ] = useMemeEmojisQuery({ variables: { memeId: meme.id } });
+  if (MemeEmojisError) console.log(MemeEmojisError);
+  const emojis = MemeEmojisData?.memeEmojis.map((emoji) => (
+    <EmojiButton refetch={refetch} emoji={emoji} memeId={meme.id} />
+  ));
   const canDelete =
-    !error &&
-    !fetching &&
-    data?.me &&
-    (meme.userId === data.me.id || data.me.username === ADMIN_NAME) &&
+    !meError &&
+    !meFetching &&
+    meData?.me &&
+    (meme.userId === meData.me.id || meData.me.username === ADMIN_NAME) &&
     !meme.isHive;
   return (
     <>
       <Flex mt={2} justifyContent="center" align="center">
-        {canDelete ? <DeleteButton meme={meme} /> : null}
         <DownvoteButton isLoading={isOpen} size="sm" meme={meme} />
         <Button size="sm" m={1} onClick={() => router.push(`/meme/${meme.id}`)}>
           <FontAwesomeIcon icon="comment-alt" size="lg" />
@@ -155,11 +169,6 @@ export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
             {Humanize.compactInteger(meme.numComments, 1)}
           </Text>
         </Button>
-        <Flex mr={2} justifyContent="center" alignItems="center">
-          <Text color={color} ml={2} fontSize="30px" fontWeight="bold">
-            {grade}
-          </Text>
-        </Flex>
         <UpvoteButton
           isLoading={isOpen}
           size="sm"
@@ -174,6 +183,16 @@ export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
         isOpen={isOpen}
         onToggle={onToggle}
       />
+      <Flex justifyContent="center" alignItems="center" my={1}>
+        {canDelete ? <DeleteButton meme={meme} /> : null}
+        <Button m={1} size="sm">
+          <Text color={color}>{grade}</Text>
+        </Button>
+        <AddEmoji refetch={refetch} m={1} memeId={meme.id} />
+      </Flex>
+      <Flex justifyContent="center" alignItems="center">
+        {emojis}
+      </Flex>
     </>
   );
 };

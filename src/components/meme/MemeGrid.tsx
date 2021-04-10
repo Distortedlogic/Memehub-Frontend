@@ -1,78 +1,201 @@
-import { Box, Divider, Flex, Grid } from "@chakra-ui/layout";
-import React, { Fragment } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { loader } from "src/components/utils/loader";
+import { Button } from "@chakra-ui/button";
+import { useDisclosure } from "@chakra-ui/hooks";
+import { Image } from "@chakra-ui/image";
+import { Badge, Box, BoxProps, Flex, Text } from "@chakra-ui/layout";
+import { Tooltip } from "@chakra-ui/tooltip";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import ellipsize from "ellipsize";
+import Humanize from "humanize-plus";
+import { useRouter } from "next/router";
+import React from "react";
+import { AvatarLink } from "src/components/utils/AvatarLink";
 import {
   MemeFragment,
+  useMemeEmojisQuery,
+  useMeQuery,
   UserFragment,
-  UserMemeFragment,
 } from "src/generated/graphql";
 import { useStoreState } from "src/store/store";
-import { endMessage } from "../utils/endMessage";
-import { ScrollToTop } from "../utils/ScrollToTop";
-import { MemeBox } from "./MemeBox";
-import { MemeCard } from "./MemeCard";
+import { ADMIN_NAME } from "src/utils/constants";
+import { ratioToColorGrade } from "src/utils/functions";
+import { AddEmoji } from "../emojis/AddEmoji";
+import { DeleteButton } from "./utils/DeleteButton";
+import { DownvoteButton } from "./utils/DownvoteButton";
+import { HiveVoteButtons } from "./utils/HiveVoteButtons";
+import { PeakdMemeLink } from "./utils/PeakdLink";
+import { UpvoteButton } from "./utils/UpvoteButton";
+dayjs.extend(relativeTime);
 
-type MemeGridProps = {
-  hasMore: boolean;
-  loadMore: () => void;
-  pagedMemes: (UserMemeFragment | MemeFragment)[];
-  user?: UserFragment;
+interface MemeGridProps extends BoxProps {
+  displayUser: boolean;
+  meme: MemeFragment;
+  user: UserFragment;
+}
+
+export const MemeGrid: React.FC<MemeGridProps> = (props) => {
+  let { meme, user, displayUser, ...boxprops } = props;
+  const router = useRouter();
+  return (
+    <Flex direction="column" {...boxprops} p={6}>
+      <TopBar meme={meme} user={user} displayUser={displayUser} />
+      <Flex
+        _hover={{ cursor: "pointer" }}
+        onClick={() => {
+          router.push(`/meme/${meme.id}`);
+        }}
+        justifyContent="center"
+        alignItems="center"
+        p={2}
+      >
+        <Image rounded="md" w="auto" src={meme.url} />
+      </Flex>
+      <BottomBar user={user} meme={meme} />
+    </Flex>
+  );
 };
 
-export const MemeGrid: React.FC<MemeGridProps> = ({
-  hasMore,
-  pagedMemes,
-  user,
-  loadMore,
-}) => {
+interface TopBarProps {
+  displayUser: boolean;
+  meme: MemeFragment;
+  user: UserFragment;
+}
+
+const TopBar: React.FC<TopBarProps> = ({ user, meme, displayUser }) => {
   const {
     settings: { gridView },
   } = useStoreState((state) => state);
-
-  const MemeDisplay = gridView === "list" ? MemeCard : MemeBox;
-  const memeComponents = pagedMemes.map((meme) => (
-    <Fragment key={meme.id}>
-      <MemeDisplay
-        mb={2}
-        topfull={user ? false : true}
-        meme={meme}
-        user={user ? user : (meme as UserMemeFragment).user}
-      />
-      <Divider />
-    </Fragment>
-  ));
-  const grid =
-    gridView === "grid" ? (
-      <Grid ml={3} gridTemplateColumns="repeat(3, 1fr)">
-        <Box ml={1} mr={1}>
-          {memeComponents.filter((_, i) => i % 3 === 0)}
-        </Box>
-        <Box ml={1} mr={1}>
-          {memeComponents.filter((_, i) => i % 3 === 1)}
-        </Box>
-        <Box ml={1} mr={1}>
-          {memeComponents.filter((_, i) => i % 3 === 2)}
-        </Box>
-      </Grid>
-    ) : (
-      <Flex alignItems="center" justifyContent="center">
-        <Flex direction="column" w={gridView === "blog" ? "60%" : "100%"}>
-          {memeComponents}
+  const hiveBadge = user.isHive ? (
+    <Badge ml="2" colorScheme="red">
+      Hive
+    </Badge>
+  ) : null;
+  const ogBadge = [
+    "memehub",
+    "aninsidejob",
+    "cmmemes",
+    "anthonyadavisii",
+    "memehub.bot",
+  ].includes(user.username) ? (
+    <Badge ml="2" colorScheme="blue">
+      OG
+    </Badge>
+  ) : null;
+  const topBar = (
+    <Flex justifyContent="center" alignItems="center">
+      <AvatarLink userId={user.id} size="md" src={user.avatar} />
+      <Box ml={2}>
+        <Text fontSize="md" fontWeight="bold" mx={2}>
+          {user.username}
+        </Text>
+        <Flex>
+          {hiveBadge}
+          {ogBadge}
         </Flex>
+      </Box>
+    </Flex>
+  );
+
+  if (displayUser) {
+    if (gridView === "grid") {
+      return (
+        <Flex alignItems="center" direction="column">
+          {topBar}
+          <Text mt={2} fontSize="sm">
+            {dayjs(meme.createdAt).fromNow()}
+          </Text>
+          <Text textAlign="center">{ellipsize(meme.title, 40)}</Text>
+        </Flex>
+      );
+    } else {
+      return (
+        <Flex direction="column">
+          <Flex mb={4} justifyContent="space-between">
+            {topBar}
+            <Text fontSize="sm" mx={2}>
+              {dayjs(meme.createdAt).fromNow()}
+            </Text>
+          </Flex>
+          <Text textAlign="center">{ellipsize(meme.title, 40)}</Text>
+        </Flex>
+      );
+    }
+  } else {
+    return (
+      <Flex mb={4} justifyContent="space-between">
+        <Text mx={2} textOverflow="ellipsis">
+          {ellipsize(meme.title, 20)}
+        </Text>
+        <Text fontSize="sm" mx={2}>
+          {dayjs(meme.createdAt).fromNow()}
+        </Text>
       </Flex>
     );
+  }
+};
 
+interface BottomBarProps {
+  user: UserFragment;
+  meme: MemeFragment;
+}
+
+export const BottomBar: React.FC<BottomBarProps> = ({ meme, user }) => {
+  const { grade, color } = ratioToColorGrade(meme.ratio);
+  const router = useRouter();
+  const { isOpen, onToggle } = useDisclosure();
+  const [{ data: meData, fetching: meFetching, error: meError }] = useMeQuery();
+  const [
+    { data: MemeEmojisData, error: MemeEmojisError },
+  ] = useMemeEmojisQuery({ variables: { memeId: meme.id } });
+  if (MemeEmojisError) console.log(MemeEmojisError);
+  const emojis = MemeEmojisData?.memeEmojis.map((data) => (
+    <Tooltip label={data.name}>
+      <Button m={1} size="sm" key={data.id}>
+        <Image maxHeight="25px" src={data.url} /> {data.count}
+      </Button>
+    </Tooltip>
+  ));
+  const canDelete =
+    !meError &&
+    !meFetching &&
+    meData?.me &&
+    (meme.userId === meData.me.id || meData.me.username === ADMIN_NAME) &&
+    !meme.isHive;
   return (
-    <InfiniteScroll
-      dataLength={memeComponents.length}
-      next={loadMore}
-      hasMore={hasMore}
-      loader={loader}
-      endMessage={endMessage}
-    >
-      {grid}
-      <ScrollToTop />
-    </InfiniteScroll>
+    <>
+      <Flex mt={2} justifyContent="center" align="center">
+        <DownvoteButton isLoading={isOpen} size="sm" meme={meme} />
+        <Button size="sm" m={1} onClick={() => router.push(`/meme/${meme.id}`)}>
+          <FontAwesomeIcon icon="comment-alt" size="lg" />
+          <Text fontSize="15px" fontWeight="bold" ml={2}>
+            {Humanize.compactInteger(meme.numComments, 1)}
+          </Text>
+        </Button>
+        <UpvoteButton
+          isLoading={isOpen}
+          size="sm"
+          meme={meme}
+          toggleHiveVote={onToggle}
+        />
+        <PeakdMemeLink ml={4} meme={meme} user={user} imgHeight="30px" />
+      </Flex>
+      <HiveVoteButtons
+        meme={meme}
+        user={user}
+        isOpen={isOpen}
+        onToggle={onToggle}
+      />
+      <Flex justifyContent="center" alignItems="center" my={1}>
+        {canDelete ? <DeleteButton meme={meme} /> : null}
+        <Button m={1} size="sm">
+          <Text color={color}>{grade}</Text>
+        </Button>
+        <AddEmoji m={1} memeId={meme.id} />
+      </Flex>
+      <Flex justifyContent="center" alignItems="center">
+        {emojis}
+      </Flex>
+    </>
   );
 };

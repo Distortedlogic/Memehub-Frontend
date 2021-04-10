@@ -13,21 +13,21 @@ import { AvatarLink } from "src/components/utils/AvatarLink";
 import { MemeFragment, useMeQuery, UserFragment } from "src/generated/graphql";
 import { ratioToColorGrade } from "src/utils/functions";
 import { ADMIN_NAME } from "../../utils/constants";
-import { DeleteButton } from "./DeleteButton";
-import { DownvoteButton } from "./DownvoteButton";
-import { HiveVoteButtons } from "./HiveVoteButtons";
-import { PeakdMemeLink } from "./PeakdLink";
-import { UpvoteButton } from "./UpvoteButton";
+import { DeleteButton } from "./utils/DeleteButton";
+import { DownvoteButton } from "./utils/DownvoteButton";
+import { HiveVoteButtons } from "./utils/HiveVoteButtons";
+import { PeakdMemeLink } from "./utils/PeakdLink";
+import { UpvoteButton } from "./utils/UpvoteButton";
 dayjs.extend(relativeTime);
 
-interface MemeCardProps extends FlexProps {
-  topfull: boolean;
+interface MemeListProps extends FlexProps {
+  displayUser: boolean;
   meme: MemeFragment;
   user: UserFragment;
 }
 
-export const MemeCard: React.FC<MemeCardProps> = (props) => {
-  let { meme, user, topfull } = props;
+export const MemeList: React.FC<MemeListProps> = (props) => {
+  let { meme, user, displayUser } = props;
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
   return (
@@ -46,7 +46,7 @@ export const MemeCard: React.FC<MemeCardProps> = (props) => {
           </Flex>
           <Text fontSize="sm">{dayjs(meme.createdAt).fromNow()}</Text>
         </Flex>
-        <TopBar meme={meme} user={user} topfull={topfull} />
+        <TopBar meme={meme} user={user} displayUser={displayUser} />
         <BottomBar
           user={user}
           meme={meme}
@@ -65,12 +65,12 @@ export const MemeCard: React.FC<MemeCardProps> = (props) => {
 };
 
 interface TopBarProps {
-  topfull: boolean;
+  displayUser: boolean;
   meme: MemeFragment;
   user: UserFragment;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
+export const TopBar: React.FC<TopBarProps> = ({ user, meme, displayUser }) => {
   const hiveBadge = user.isHive ? (
     <Badge ml="2" colorScheme="red">
       Hive
@@ -88,7 +88,7 @@ export const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
     </Badge>
   ) : null;
 
-  if (topfull) {
+  if (displayUser) {
     return (
       <Flex w="100%" direction="column" px={4}>
         <Flex mb={4} justifyContent="start" alignItems="center">

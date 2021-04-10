@@ -2,7 +2,7 @@ import { Flex } from "@chakra-ui/layout";
 import React, { useState } from "react";
 import { useTopRatedMemesQuery } from "src/generated/graphql";
 import { DoubleColLayout } from "src/pages/_doubleColLayout";
-import { MemeGrid } from "./MemeGrid";
+import { PagedMemes } from "./PagedMemes";
 
 interface TopRatedProps {
   days: number;
@@ -28,7 +28,11 @@ export const TopRated: React.FC<TopRatedProps> = ({ days }) => {
     return (
       <DoubleColLayout>
         <Flex justifyContent="center" alignItems="center" minHeight="80vh">
-          <MemeGrid pagedMemes={memes} hasMore={hasMore} loadMore={loadMore} />
+          <PagedMemes
+            pagedMemes={memes}
+            hasMore={hasMore}
+            loadMore={loadMore}
+          />
         </Flex>
       </DoubleColLayout>
     );

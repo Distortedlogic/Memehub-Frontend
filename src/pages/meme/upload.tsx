@@ -1,25 +1,30 @@
 import { Button } from "@chakra-ui/button";
 import { Checkbox } from "@chakra-ui/checkbox";
+import { CheckIcon } from "@chakra-ui/icons";
 import { Image } from "@chakra-ui/image";
 import { Box, Flex, Text } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
 import InputField from "src/components/utils/InputField";
+import { useMeUploadQuery } from "src/generated/graphql";
 import { useIsAuth } from "src/hooks/isAuth";
 import { useClipboard } from "src/hooks/useClipboard";
 import { useUpload } from "src/hooks/useUpload";
 import { urqlClient } from "src/urql/urqlClient";
 import { BUCKET_BASE_URL } from "src/utils/constants";
 import { SingleColLayout } from "../_singleColLayout";
-
+dayjs.extend(relativeTime);
 interface UploadProps {}
 
 const Upload: React.FC<UploadProps> = () => {
-  const [{ data, error, fetching }] = useIsAuth();
+  useIsAuth();
+  const [{ data, error, fetching }] = useMeUploadQuery();
   const toast = useToast();
   const router = useRouter();
   const uploadFN = useUpload();
@@ -27,6 +32,25 @@ const Upload: React.FC<UploadProps> = () => {
   if (error) console.log("error", error);
   if (fetching || !data?.me) return <></>;
   const { me } = data;
+  const canHivePost =
+    !me.lastHivePost ||
+    (me.lastHivePost && dayjs(me.lastHivePost) < dayjs().subtract(1, "d"));
+  const canMemehubPost =
+    !me.lastMemehubPost ||
+    (me.lastMemehubPost &&
+      dayjs(me.lastMemehubPost) < dayjs().subtract(1, "d"));
+  const hivePostCheck = (
+    <Button my={1} size="sm">
+      <Image h="20px" src={BUCKET_BASE_URL + "/logos/hive.png"} mr={2} />
+      {canHivePost ? <CheckIcon /> : dayjs(me.lastHivePost).fromNow()}
+    </Button>
+  );
+  const memehubPostCheck = (
+    <Button my={1} size="sm">
+      <Image h="20px" src={BUCKET_BASE_URL + "/logos/icon.png"} mr={2} />
+      {canMemehubPost ? <CheckIcon /> : dayjs(me.lastMemehubPost).fromNow()}
+    </Button>
+  );
   return (
     <SingleColLayout>
       <Formik
@@ -124,15 +148,26 @@ const Upload: React.FC<UploadProps> = () => {
                     <FontAwesomeIcon icon={["fas", "trash"]} />
                   </Button>
                 </Flex>
-                <Checkbox
-                  mt={2}
-                  onChange={() => setFieldValue("isHive", !isHive)}
-                >
-                  <Text>Post to Hive</Text>
-                </Checkbox>
+                <Flex my={2}>
+                  <Checkbox onChange={() => setFieldValue("isHive", !isHive)}>
+                    <Text>Post to Hive</Text>
+                  </Checkbox>
+                  <Flex justifyContent="center" alignItems="center" flex={1}>
+                    <Flex w="60%">
+                      <Text>
+                        There is a one meme post per day limit to each Hive and
+                        Memehub respectively
+                      </Text>
+                    </Flex>
+                  </Flex>
+                  <Flex direction="column">
+                    {hivePostCheck}
+                    {memehubPostCheck}
+                  </Flex>
+                </Flex>
                 {me.isHive ? null : (
                   <Button
-                    mt={4}
+                    mb={4}
                     onClick={() => {
                       router.push("/onboarding/newHiveAcct");
                     }}
@@ -140,11 +175,23 @@ const Upload: React.FC<UploadProps> = () => {
                     Turn Dankness into Crypto! Get a Hive Acct Here!
                   </Button>
                 )}
-                <Button mt={4} type="submit" isLoading={isSubmitting}>
-                  {isHive
-                    ? "Posting to Hive and Memehub"
-                    : "Posting To Memehub Only"}
-                </Button>
+                {isHive ? (
+                  <Button
+                    isDisabled={!canHivePost}
+                    type="submit"
+                    isLoading={isSubmitting}
+                  >
+                    Posting to Hive and Memehub
+                  </Button>
+                ) : (
+                  <Button
+                    isDisabled={!canMemehubPost}
+                    type="submit"
+                    isLoading={isSubmitting}
+                  >
+                    Posting Memehub Only
+                  </Button>
+                )}
               </Flex>
             </Flex>
           </Form>
