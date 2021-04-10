@@ -1,17 +1,19 @@
 import { useToast } from "@chakra-ui/toast";
 import { CommentOperation } from "@hiveio/dhive";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import {
   useDeleteMemeMutation,
   useGetSignedUrlMutation,
-  useMeQuery,
+  useMeUploadQuery,
   usePostMemeMutation,
   useSetMemeIsHiveMutation,
 } from "src/generated/graphql";
 import { HIVE_COMMUNITY } from "src/utils/constants";
 import { useUploadValidation } from "./useUploadValidation";
-
+dayjs.extend(relativeTime);
 export const useUpload = () => {
-  const [{ data, error, fetching }] = useMeQuery();
+  const [{ data, error, fetching }] = useMeUploadQuery();
   const [, deleteMemeFN] = useDeleteMemeMutation();
   const [, getSignedUrlFN] = useGetSignedUrlMutation();
   const [, postMemeFN] = usePostMemeMutation();
@@ -26,6 +28,10 @@ export const useUpload = () => {
       _title: string
     ) => undefined;
   const { me } = data;
+  const canHivePost =
+    me.lastHivePost && dayjs(me.lastHivePost) > dayjs().subtract(1, "d");
+  const canMemehubPost =
+    me.lastMemehubPost && dayjs(me.lastMemehubPost) > dayjs().subtract(1, "d");
   return async (
     file: File | undefined,
     postToHive: boolean,

@@ -1,14 +1,10 @@
 import { Button } from "@chakra-ui/button";
-import { useDisclosure } from "@chakra-ui/hooks";
-import { Image } from "@chakra-ui/image";
-import { Box, Flex, SimpleGrid, Text } from "@chakra-ui/layout";
+import { Box, Flex } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
-import { Collapse } from "@chakra-ui/transition";
 import { CommentOperation } from "@hiveio/dhive";
 import { Form, Formik } from "formik";
 import React from "react";
 import {
-  useEmojisQuery,
   useMeQuery,
   usePostCommentMutation,
   UserMemeFragment,
@@ -23,15 +19,11 @@ interface PostCommentFieldProps {
 }
 
 export const PostCommentField: React.FC<PostCommentFieldProps> = ({ meme }) => {
-  const { isOpen, onToggle } = useDisclosure();
   const [, postCommentFN] = usePostCommentMutation();
   const [, setCommentIsHiveFN] = useSetCommentIsHiveMutation();
   const toast = useToast();
   const [{ fetching, error, data: meData }] = useMeQuery();
-  const [
-    { fetching: emojiFetching, error: emojiError, data: emojiData },
-  ] = useEmojisQuery();
-  if (error || emojiError) console.log(error, emojiError);
+  if (error) console.log(error);
   if (fetching) {
     return <></>;
   }
@@ -128,13 +120,10 @@ export const PostCommentField: React.FC<PostCommentFieldProps> = ({ meme }) => {
   return (
     <Box mt={2}>
       <Formik initialValues={{ text: "" }} onSubmit={handleSubmit}>
-        {({ isSubmitting, values, setFieldValue }) => (
+        {({ isSubmitting }) => (
           <Form>
             <Flex direction="column">
               <Flex alignItems="center" justifyContent="center">
-                <Button onClick={onToggle} h="5rem" mr={2}>
-                  <Text>Emojis</Text>
-                </Button>
                 <InputField
                   textArea
                   flex={1}
@@ -146,43 +135,6 @@ export const PostCommentField: React.FC<PostCommentFieldProps> = ({ meme }) => {
                   Send
                 </Button>
               </Flex>
-              <Collapse in={isOpen}>
-                <SimpleGrid
-                  mt={2}
-                  p={4}
-                  backgroundColor="black"
-                  rounded="md"
-                  minChildWidth="80px"
-                  spacing="15px"
-                >
-                  {emojiFetching || !emojiData?.emojis
-                    ? null
-                    : emojiData.emojis.map((emoji) => {
-                        return (
-                          <Button
-                            py={2}
-                            px={0}
-                            key={emoji.name}
-                            onClick={() => {
-                              setFieldValue(
-                                "text",
-                                values.text + ` :${emoji.name}: `
-                              );
-                              toast({
-                                title: "emoji added to comment",
-                                status: "success",
-                                isClosable: true,
-                                duration: 3000,
-                              });
-                            }}
-                            height="80px"
-                          >
-                            <Image src={emoji.url} />
-                          </Button>
-                        );
-                      })}
-                </SimpleGrid>
-              </Collapse>
             </Flex>
           </Form>
         )}

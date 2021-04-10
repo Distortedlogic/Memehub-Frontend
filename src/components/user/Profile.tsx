@@ -30,7 +30,7 @@ import { DoubleColLayout } from "src/pages/_doubleColLayout";
 import { capitalizeFirstLetter, ratioToColorGrade } from "src/utils/functions";
 import { DownvoteButton } from "../comments/DownvoteButton";
 import { UpvoteButton } from "../comments/UpvoteButton";
-import { MemeGrid } from "../meme/MemeGrid";
+import { PagedMemes } from "../meme/PagedMemes";
 import { endMessage } from "../utils/endMessage";
 dayjs.extend(relativeTime);
 const take = 16;
@@ -111,7 +111,9 @@ export const Profile: React.FC<ProfileProps> = ({ user }) => {
           </Flex>
         </Flex>
         {isMemes ? (
-          <Memes user={user} order={order} />
+          <Flex justifyContent="center" alignItems="center">
+            <Memes user={user} order={order} />
+          </Flex>
         ) : (
           <Comments userId={user.id} order={order} />
         )}
@@ -137,7 +139,7 @@ const Memes: React.FC<MemesProps> = ({ user, order }) => {
   }
   const { hasMore, items: memes } = data.userMemes;
   return (
-    <MemeGrid
+    <PagedMemes
       user={user}
       pagedMemes={memes}
       hasMore={hasMore}

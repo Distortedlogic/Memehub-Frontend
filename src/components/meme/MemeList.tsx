@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/button";
 import { useDisclosure } from "@chakra-ui/hooks";
 import { Image } from "@chakra-ui/image";
-import { Badge, Box, BoxProps, Flex, Text } from "@chakra-ui/layout";
+import { Badge, Box, Flex, FlexProps, Text } from "@chakra-ui/layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -10,38 +10,43 @@ import Humanize from "humanize-plus";
 import { useRouter } from "next/router";
 import React from "react";
 import { AvatarLink } from "src/components/utils/AvatarLink";
-import { MemeFragment, UserFragment } from "src/generated/graphql";
+import { MemeFragment, useMeQuery, UserFragment } from "src/generated/graphql";
 import { ratioToColorGrade } from "src/utils/functions";
-import { DownvoteButton } from "./DownvoteButton";
-import { HiveVoteButtons } from "./HiveVoteButtons";
-import { PeakdMemeLink } from "./PeakdLink";
-import { UpvoteButton } from "./UpvoteButton";
+import { ADMIN_NAME } from "../../utils/constants";
+import { DeleteButton } from "./utils/DeleteButton";
+import { DownvoteButton } from "./utils/DownvoteButton";
+import { HiveVoteButtons } from "./utils/HiveVoteButtons";
+import { PeakdMemeLink } from "./utils/PeakdLink";
+import { UpvoteButton } from "./utils/UpvoteButton";
 dayjs.extend(relativeTime);
 
-interface MemeCardProps extends BoxProps {
-  topfull: boolean;
+interface MemeListProps extends FlexProps {
+  displayUser: boolean;
   meme: MemeFragment;
   user: UserFragment;
 }
 
-export const MemeCard: React.FC<MemeCardProps> = (props) => {
-  let { meme, user, topfull } = props;
+export const MemeList: React.FC<MemeListProps> = (props) => {
+  let { meme, user, displayUser } = props;
   const router = useRouter();
   const { isOpen, onToggle } = useDisclosure();
   return (
-    <Flex direction="column">
+    <Flex w="100%" direction="column">
       <Flex {...props} justifyContent="space-between" alignItems="center" p={4}>
-        <Flex
-          _hover={{ cursor: "pointer" }}
-          onClick={() => {
-            router.push(`meme/${meme.id}`);
-          }}
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Image rounded="md" w="150px" src={meme.url} />
+        <Flex alignItems="center" direction="column">
+          <Flex
+            _hover={{ cursor: "pointer" }}
+            onClick={() => {
+              router.push(`meme/${meme.id}`);
+            }}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Image rounded="md" w="150px" src={meme.url} />
+          </Flex>
+          <Text fontSize="sm">{dayjs(meme.createdAt).fromNow()}</Text>
         </Flex>
-        <TopBar meme={meme} user={user} topfull={topfull} />
+        <TopBar meme={meme} user={user} displayUser={displayUser} />
         <BottomBar
           user={user}
           meme={meme}
@@ -60,12 +65,12 @@ export const MemeCard: React.FC<MemeCardProps> = (props) => {
 };
 
 interface TopBarProps {
-  topfull: boolean;
+  displayUser: boolean;
   meme: MemeFragment;
   user: UserFragment;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
+export const TopBar: React.FC<TopBarProps> = ({ user, meme, displayUser }) => {
   const hiveBadge = user.isHive ? (
     <Badge ml="2" colorScheme="red">
       Hive
@@ -82,29 +87,21 @@ export const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
       OG
     </Badge>
   ) : null;
-  const topBar = (
-    <Flex justifyContent="center" alignItems="center">
-      <AvatarLink userId={user.id} size="sm" src={user.avatar} />
-      <Box ml={2}>
-        <Text fontSize="md" mx={2}>
-          {user.username}
-        </Text>
-        <Flex>
-          {hiveBadge}
-          {ogBadge}
-        </Flex>
-      </Box>
-    </Flex>
-  );
 
-  if (topfull) {
+  if (displayUser) {
     return (
       <Flex w="100%" direction="column" px={4}>
         <Flex mb={4} justifyContent="start" alignItems="center">
-          {topBar}
-          <Text fontSize="sm" mx={2}>
-            {dayjs(meme.createdAt).fromNow()}
-          </Text>
+          <AvatarLink userId={user.id} size="sm" src={user.avatar} />
+          <Box ml={2}>
+            <Text fontSize="md" mx={2}>
+              {user.username}
+            </Text>
+            <Flex>
+              {hiveBadge}
+              {ogBadge}
+            </Flex>
+          </Box>
         </Flex>
         <Flex>
           <PeakdMemeLink mr={4} meme={meme} user={user} imgHeight="30px" />
@@ -114,16 +111,12 @@ export const TopBar: React.FC<TopBarProps> = ({ user, meme, topfull }) => {
     );
   } else {
     return (
-      <Flex mb={4} justifyContent="space-between">
-        <Flex>
-          <PeakdMemeLink mr={4} meme={meme} user={user} imgHeight="30px" />
-          <Text mx={2} textOverflow="ellipsis">
-            {ellipsize(meme.title, 20)}
-          </Text>
+      <Flex w="100%" px={4}>
+        <Flex justifyContent="center" alignItems="center">
+          <PeakdMemeLink meme={meme} user={user} imgHeight="30px" />
         </Flex>
-        <Text textAlign="center">{ellipsize(meme.title, 40)}</Text>
-        <Text fontSize="sm" mx={2}>
-          {dayjs(meme.createdAt).fromNow()}
+        <Text mr={4} textAlign="center">
+          {ellipsize(meme.title, 20)}
         </Text>
       </Flex>
     );
@@ -144,6 +137,13 @@ export const BottomBar: React.FC<BottomBarProps> = ({
 }) => {
   const { grade, color } = ratioToColorGrade(meme.ratio);
   const router = useRouter();
+  const [{ data, fetching, error }] = useMeQuery();
+  const canDelete =
+    !error &&
+    !fetching &&
+    data?.me &&
+    (meme.userId === data.me.id || data.me.username === ADMIN_NAME) &&
+    !meme.isHive;
   return (
     <>
       <Flex justifyContent="center" align="center">
@@ -163,6 +163,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({
               {grade}
             </Text>
           </Flex>
+          {canDelete ? <DeleteButton meme={meme} /> : null}
         </Flex>
         <Flex direction="column">
           <UpvoteButton

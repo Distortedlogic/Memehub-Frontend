@@ -1,7 +1,7 @@
 import { Flex } from "@chakra-ui/layout";
 import { withUrqlClient } from "next-urql";
 import React, { useState } from "react";
-import { MemeGrid } from "src/components/meme/MemeGrid";
+import { PagedMemes } from "src/components/meme/PagedMemes";
 import { useHotMemesQuery } from "src/generated/graphql";
 import { urqlClient } from "src/urql/urqlClient";
 import { DoubleColLayout } from "./_doubleColLayout";
@@ -27,7 +27,13 @@ const Hot: React.FC<HotProps> = ({}) => {
     const { hasMore, items: memes } = data.hotMemes;
     return (
       <DoubleColLayout>
-        <MemeGrid pagedMemes={memes} hasMore={hasMore} loadMore={loadMore} />
+        <Flex justifyContent="center" alignItems="center" minHeight="80vh">
+          <PagedMemes
+            pagedMemes={memes}
+            hasMore={hasMore}
+            loadMore={loadMore}
+          />
+        </Flex>
       </DoubleColLayout>
     );
   }
