@@ -28,10 +28,6 @@ export const useUpload = () => {
       _title: string
     ) => undefined;
   const { me } = data;
-  const canHivePost =
-    me.lastHivePost && dayjs(me.lastHivePost) > dayjs().subtract(1, "d");
-  const canMemehubPost =
-    me.lastMemehubPost && dayjs(me.lastMemehubPost) > dayjs().subtract(1, "d");
   return async (
     file: File | undefined,
     postToHive: boolean,
