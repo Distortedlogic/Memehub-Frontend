@@ -12,7 +12,7 @@ const Rankings: React.FC<RankingsProps> = () => {
   const [timeFrame, setTD] = useState("ever");
   return (
     <DoubleColLayout>
-      <Box>
+      <Box minHeight="80vh">
         <Flex
           p={4}
           mt={2}
