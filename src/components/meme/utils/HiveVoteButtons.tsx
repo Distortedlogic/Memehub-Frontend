@@ -6,12 +6,18 @@ import {
   SliderThumb,
   SliderTrack,
 } from "@chakra-ui/slider";
+import { useToast } from "@chakra-ui/toast";
 import { Tooltip } from "@chakra-ui/tooltip";
 import { Collapse } from "@chakra-ui/transition";
 import { Form, Formik } from "formik";
 import React from "react";
-import { MemeFragment, UserFragment } from "src/generated/graphql";
+import {
+  MemeFragment,
+  UserFragment,
+  useUpVoteMemeMutation,
+} from "src/generated/graphql";
 import { useHandleMemeHiveVote } from "src/hooks/useHandleHiveVote";
+import { useHasVoted } from "src/hooks/useHasVoted";
 
 interface HiveVoteButtonsProps {
   meme: MemeFragment;
@@ -26,13 +32,26 @@ export const HiveVoteButtons: React.FC<HiveVoteButtonsProps> = ({
   isOpen,
   onToggle,
 }) => {
+  const toast = useToast();
+  const [, upVoteMemeFN] = useUpVoteMemeMutation();
   const handleHiveVote = useHandleMemeHiveVote(meme, user);
+  const hasVoted = useHasVoted(meme);
+  const handleUpvote = async () => {
+    if (!hasVoted()) {
+      const { data } = await upVoteMemeFN({ memeId: meme.id });
+      if (data?.upVoteMeme) {
+        toast({ title: "Upvote Sent", status: "success" });
+      }
+      onToggle();
+    }
+  };
   return (
     <Collapse in={isOpen}>
       <Formik
         initialValues={{ voteWieght: 100 }}
         onSubmit={async (values) => {
           handleHiveVote(values.voteWieght * 100);
+          onToggle();
         }}
       >
         {({ isSubmitting, values: { voteWieght }, setFieldValue }) => (
@@ -74,7 +93,12 @@ export const HiveVoteButtons: React.FC<HiveVoteButtonsProps> = ({
                 <Button w="100%" mt={2} type="submit" isLoading={isSubmitting}>
                   Upvote on Hive and Memehub
                 </Button>
-                <Button w="100%" mt={2} isLoading={isSubmitting}>
+                <Button
+                  onClick={handleUpvote}
+                  w="100%"
+                  mt={2}
+                  isLoading={isSubmitting}
+                >
                   Upvote on Memehub Only
                 </Button>
                 <Button
