@@ -21,13 +21,13 @@ export const useClipboard = () => {
     } catch (error) {
       found = true;
     }
+    console.log("found", found);
     if (found) {
-      setFieldValue(
-        "file",
-        new File([imgBlob!], "clipboard.png", {
-          type: imgBlob!.type,
-        })
-      );
+      const file = new File([imgBlob!], "clipboard.png", {
+        type: imgBlob!.type,
+      });
+      setFieldValue("file", file);
+      setFieldValue("url", URL.createObjectURL(file));
     } else {
       toast({
         title: "Memehub did not find an image in your clipboard!",
