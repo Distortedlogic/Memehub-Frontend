@@ -42,27 +42,34 @@ export const SellButton: React.FC<SellButtonProps> = ({
     if (!meData?.me) {
       router.push("/onboarding/hiveLogin?next=/market/stonks");
     } else {
-      const { data, error } = await makeTradeFN({
-        name,
-        type: "sell",
-        position,
-      });
-      console.log("data", data);
-      if (!error && data?.makeTrade) {
-        const { makeTrade } = data;
-        meData.me.gbp += makeTrade.price * makeTrade.position;
-        toast({
-          title: "Successful Sell",
-          description: `name - ${makeTrade.name}
+      if (currentPosition > position) {
+        const { data, error } = await makeTradeFN({
+          name,
+          type: "sell",
+          position,
+        });
+        console.log("data", data);
+        if (!error && data?.makeTrade) {
+          const { makeTrade } = data;
+          meData.me.gbp += makeTrade.price * makeTrade.position;
+          toast({
+            title: "Successful Sell",
+            description: `name - ${makeTrade.name}
         price - ${makeTrade.price}
         position - ${makeTrade.position}
         GBP - ${meData.me.gbp}
         `,
-          status: "success",
-        });
+            status: "success",
+          });
+        } else {
+          toast({
+            title: "Something went wrong",
+            status: "error",
+          });
+        }
       } else {
         toast({
-          title: "Something went wrong",
+          title: "You dont have enough for this sell :(",
           status: "error",
         });
       }
