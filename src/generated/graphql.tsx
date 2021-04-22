@@ -154,10 +154,10 @@ export type QueryMarketHistoryArgs = {
 
 
 export type QueryStonksArgs = {
-  order: Scalars['String'];
-  onlyPositions: Scalars['Boolean'];
-  skip: Scalars['Int'];
-  take: Scalars['Int'];
+  skip?: Maybe<Scalars['Int']>;
+  take?: Maybe<Scalars['Int']>;
+  order?: Maybe<Scalars['String']>;
+  onlyPositions?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -1191,10 +1191,10 @@ export type StonkFragment = (
 );
 
 export type StonksQueryVariables = Exact<{
-  take: Scalars['Int'];
-  skip: Scalars['Int'];
-  onlyPositions: Scalars['Boolean'];
-  order: Scalars['String'];
+  onlyPositions?: Maybe<Scalars['Boolean']>;
+  order?: Maybe<Scalars['String']>;
+  take?: Maybe<Scalars['Int']>;
+  skip?: Maybe<Scalars['Int']>;
 }>;
 
 
@@ -2082,7 +2082,7 @@ export function useMarketHistoryQuery(options: Omit<Urql.UseQueryArgs<MarketHist
   return Urql.useQuery<MarketHistoryQuery>({ query: MarketHistoryDocument, ...options });
 };
 export const StonksDocument = gql`
-    query Stonks($take: Int!, $skip: Int!, $onlyPositions: Boolean!, $order: String!) {
+    query Stonks($onlyPositions: Boolean, $order: String, $take: Int, $skip: Int) {
   stonks(take: $take, skip: $skip, order: $order, onlyPositions: $onlyPositions) {
     items {
       ...stonk
