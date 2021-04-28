@@ -116,7 +116,7 @@ export const NavBar: React.FC<NavBarProps> = () => {
 interface MenuItemProps extends FlexProps {
   icon: string;
   label: string;
-  route: string;
+  route?: string;
 }
 const MenuItem: React.FC<MenuItemProps> = (props) => {
   const { icon, label, route, ...flexprops } = props;
@@ -131,7 +131,7 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
       py={2}
       justifyContent="center"
       alignItems="center"
-      onClick={() => router.push(route)}
+      onClick={route ? () => router.push(route) : () => {}}
       {...flexprops}
     >
       <Image height="15px" src={BUCKET_BASE_URL + `/icons/${icon}.png`} />
@@ -174,16 +174,15 @@ const Login: React.FC<LoginProps> = () => {
                 roundedTop: "md",
               }}
             />
-            <MenuItem icon="wallet" label="Wallet" route="/user/wallet" />
+            <MenuItem icon="wallet" label="Wallet" route="/user/wallet/me" />
             <MenuItem
               icon="portfolio"
               label="Portfolio"
-              route="/user/portfolio"
+              route="/user/portfolio/me"
             />
             <MenuItem
               icon="logout"
               label="Logout"
-              route="/user/logout"
               onClick={() => logoutFN()}
               _hover={{
                 cursor: "pointer",

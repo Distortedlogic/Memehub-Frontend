@@ -5,7 +5,7 @@ import { Positions } from "src/components/portfolio/Positions";
 import { TradeHistory } from "src/components/portfolio/TradeHistory";
 import { useIsAuth } from "src/hooks/isAuth";
 import { urqlClient } from "src/urql/urqlClient";
-import { DoubleColLayout } from "../_doubleColLayout";
+import { DoubleColLayout } from "../../_doubleColLayout";
 
 interface portfolioProps {}
 

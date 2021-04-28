@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { Profile } from "src/components/user/Profile";
 import { urqlClient } from "src/urql/urqlClient";
-import { useUserProfileQuery } from "../../generated/graphql";
+import { useUserProfileQuery } from "../../../generated/graphql";
 
 interface UserProfileProps {}
 

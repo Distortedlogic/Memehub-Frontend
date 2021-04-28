@@ -4,8 +4,8 @@ import { useRouter } from "next/router";
 import React from "react";
 import { Profile } from "src/components/user/Profile";
 import { useMyProfileQuery } from "src/generated/graphql";
+import DoubleColLayout from "src/pages/_doubleColLayout";
 import { urqlClient } from "src/urql/urqlClient";
-import { DoubleColLayout } from "../_doubleColLayout";
 
 interface meProps {}
 

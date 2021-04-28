@@ -41,6 +41,7 @@ interface ProfileProps {
 export const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [isMemes, setIsMemes] = useState(true);
   const [order, setOrder] = useState("new");
+  const router = useRouter();
   return (
     <DoubleColLayout>
       <Flex direction="column" mt={4}>
@@ -51,6 +52,17 @@ export const Profile: React.FC<ProfileProps> = ({ user }) => {
             <Text textAlign="center" py={2} fontWeight="bold" fontSize="20px">
               {user.username}
             </Text>
+            <Flex justifyContent="center">
+              <Button
+                onClick={() => router.push(`/user/portfolio/${user.id}`)}
+                mr={2}
+              >
+                Portfolio
+              </Button>
+              <Button onClick={() => router.push(`/user/wallet/${user.id}`)}>
+                Wallet
+              </Button>
+            </Flex>
           </Flex>
           <RankScoreTable user={user} isMhp={false} />
         </Flex>

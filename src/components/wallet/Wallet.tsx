@@ -1,19 +1,19 @@
 import { Button } from "@chakra-ui/button";
 import { Divider, Flex, Link, Text } from "@chakra-ui/layout";
 import { Asset, DynamicGlobalProperties } from "@hiveio/dhive";
-import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useMeQuery } from "src/generated/graphql";
+import { UserFragment } from "src/generated/graphql";
 import { hive } from "src/hiveConnection";
-import { urqlClient } from "src/urql/urqlClient";
+import DoubleColLayout from "src/pages/_doubleColLayout";
 import useAsyncEffect from "use-async-effect";
-import { DoubleColLayout } from "../_doubleColLayout";
 
-interface WalletProps {}
+interface WalletProps {
+  user: UserFragment;
+}
 
-const Wallet: React.FC<WalletProps> = () => {
-  const [{ data, error, fetching }] = useMeQuery();
+export const Wallet: React.FC<WalletProps> = (props) => {
+  const { user } = props;
   const router = useRouter();
   const [hiveBalance, setHiveBalance] = useState(0);
   const [hivePowerBalance, setHivePowerBalance] = useState("0");
@@ -27,9 +27,9 @@ const Wallet: React.FC<WalletProps> = () => {
     setDGP(await hive.database.getDynamicGlobalProperties());
   }, []);
   useAsyncEffect(async () => {
-    if (data?.me) {
-      const acct = (await hive.database.getAccounts([data.me.username]))[0];
-      if (acct && dgp) {
+    if (user.isHive && dgp) {
+      const acct = (await hive.database.getAccounts([user.username]))[0];
+      if (acct) {
         setHiveBalance(Asset.fromString(acct.balance as string).amount);
         setHivePowerBalance(
           (
@@ -47,16 +47,8 @@ const Wallet: React.FC<WalletProps> = () => {
         );
       }
     }
-  }, [dgp, data]);
-  if (error) console.log("error", error);
-  if (error || fetching || !data) {
-    return (
-      <DoubleColLayout>
-        <></>
-      </DoubleColLayout>
-    );
-  }
-  const hiveWallet = data.me?.isHive ? (
+  }, [dgp, user]);
+  const hiveWallet = user.isHive ? (
     <Flex direction="column">
       <Flex px={6} py={2} justifyContent="space-between" alignItems="center">
         <Flex direction="column">
@@ -122,7 +114,6 @@ const Wallet: React.FC<WalletProps> = () => {
           <Text>Hive Faq</Text>
         </Link>
       </Button>
-
       <Button mt={4} onClick={() => router.push("/onboarding/newHiveAcct")}>
         Get a Hive Acct
       </Button>
@@ -140,7 +131,7 @@ const Wallet: React.FC<WalletProps> = () => {
               tokenized.
             </Text>
           </Flex>
-          <Text fontWeight="bold">{data.me ? data.me.mhp : 0}</Text>
+          <Text fontWeight="bold">{user.mhp}</Text>
         </Flex>
         <Divider />
         <Flex px={6} py={2} justifyContent="space-between" alignItems="center">
@@ -151,7 +142,7 @@ const Wallet: React.FC<WalletProps> = () => {
               project.
             </Text>
           </Flex>
-          <Text fontWeight="bold">{data.me ? data.me.gbp : 0}</Text>
+          <Text fontWeight="bold">{user.gbp}</Text>
         </Flex>
         <Divider />
         {hiveWallet}
@@ -159,4 +150,3 @@ const Wallet: React.FC<WalletProps> = () => {
     </DoubleColLayout>
   );
 };
-export default withUrqlClient(urqlClient)(Wallet);

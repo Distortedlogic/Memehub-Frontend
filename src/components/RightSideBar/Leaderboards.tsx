@@ -129,7 +129,7 @@ const Leaderboard: React.FC<LeaderboardProps> = (props) => {
             <Tr
               key={rank.user.id}
               _hover={{ backgroundColor: "gray.800", cursor: "pointer" }}
-              onClick={() => router.push(`/user/${rank.user.id}`)}
+              onClick={() => router.push(`/user/profile/${rank.user.id}`)}
             >
               <Td>
                 <Flex alignItems="center">

@@ -25,6 +25,7 @@ export type Query = {
   userComments: PaginatedComments;
   emojis: Array<Emoji>;
   memeEmojis: Array<MemeEmoji>;
+  myInvestments?: Maybe<PaginatedInvestments>;
   myMemes?: Maybe<PaginatedMemes>;
   userMemes?: Maybe<PaginatedMemes>;
   meme?: Maybe<Meme>;
@@ -34,7 +35,8 @@ export type Query = {
   userRanks: Array<Rank>;
   currentRanks: Array<Rank>;
   ranking: PaginatedRanks;
-  bestOfReddit: PaginatedRedditMemes;
+  latestReddit: PaginatedRedditMemes;
+  gasPrices: GasPrices;
   marketHistory: Array<MarketData>;
   stonks: PaginatedStonks;
   positions: PaginatedPositions;
@@ -79,6 +81,13 @@ export type QueryUserCommentsArgs = {
 
 export type QueryMemeEmojisArgs = {
   memeId: Scalars['String'];
+};
+
+
+export type QueryMyInvestmentsArgs = {
+  order: Scalars['String'];
+  skip: Scalars['Int'];
+  take: Scalars['Int'];
 };
 
 
@@ -141,7 +150,8 @@ export type QueryRankingArgs = {
 };
 
 
-export type QueryBestOfRedditArgs = {
+export type QueryLatestRedditArgs = {
+  view: Scalars['String'];
   skip: Scalars['Int'];
   take: Scalars['Int'];
 };
@@ -357,6 +367,28 @@ export type MemeEmoji = {
   hasAdded: Scalars['Boolean'];
 };
 
+export type PaginatedInvestments = {
+  __typename?: 'PaginatedInvestments';
+  items: Array<Investment>;
+  hasMore: Scalars['Boolean'];
+};
+
+export type Investment = {
+  __typename?: 'Investment';
+  id: Scalars['String'];
+  season: Scalars['Int'];
+  redditId: Scalars['String'];
+  type: Scalars['String'];
+  betSize: Scalars['Int'];
+  upvotes: Scalars['Int'];
+  target?: Maybe<Scalars['Float']>;
+  percentile: Scalars['Float'];
+  profitLoss: Scalars['Int'];
+  userId: Scalars['String'];
+  user: User;
+  createdAt: Scalars['DateTime'];
+};
+
 export type PaginatedMemes = {
   __typename?: 'PaginatedMemes';
   items: Array<Meme>;
@@ -379,6 +411,7 @@ export type RedditMeme = {
   __typename?: 'RedditMeme';
   id: Scalars['Int'];
   username: Scalars['String'];
+  redditId: Scalars['String'];
   subreddit: Scalars['String'];
   title: Scalars['String'];
   url: Scalars['String'];
@@ -391,6 +424,7 @@ export type RedditMeme = {
   stonkOfficial: Scalars['String'];
   isATemplateOfficial: Scalars['Boolean'];
   version: Scalars['String'];
+  percentile?: Maybe<Scalars['Float']>;
   timestamp: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   upvoteRatio: Scalars['Float'];
@@ -399,12 +433,28 @@ export type RedditMeme = {
   numComments: Scalars['Int'];
   redditorId: Scalars['Int'];
   redditor: Redditor;
+  investment?: Maybe<Investment>;
 };
 
 export type Redditor = {
   __typename?: 'Redditor';
   id: Scalars['Int'];
   username: Scalars['String'];
+};
+
+export type GasPrices = {
+  __typename?: 'GasPrices';
+  fast: Scalars['Float'];
+  fastest: Scalars['Float'];
+  safeLow: Scalars['Float'];
+  average: Scalars['Float'];
+  block_time: Scalars['Float'];
+  blockNum: Scalars['Float'];
+  speed: Scalars['Float'];
+  safeLowWait: Scalars['Float'];
+  avgWait: Scalars['Float'];
+  fastWait: Scalars['Float'];
+  fastestWait: Scalars['Float'];
 };
 
 export type MarketData = {
@@ -462,13 +512,13 @@ export type Mutation = {
   upVoteComment: Comment;
   downVoteComment: Comment;
   addEmoji: Scalars['Boolean'];
+  invest?: Maybe<Investment>;
   getSignedUrl: Scalars['String'];
   deleteMeme: Scalars['Boolean'];
   postMeme?: Maybe<Meme>;
   setMemeIsHive: Scalars['Boolean'];
   upVoteMeme: Meme;
   downVoteMeme: Meme;
-  redisGet: Scalars['String'];
   makeTrade?: Maybe<Trade>;
   hiveLogin: UserResponse;
   login?: Maybe<UserResponse>;
@@ -514,6 +564,14 @@ export type MutationAddEmojiArgs = {
 };
 
 
+export type MutationInvestArgs = {
+  target?: Maybe<Scalars['Float']>;
+  type: Scalars['String'];
+  redditId: Scalars['String'];
+  betSize: Scalars['Int'];
+};
+
+
 export type MutationGetSignedUrlArgs = {
   filename: Scalars['String'];
   path: Scalars['String'];
@@ -543,11 +601,6 @@ export type MutationUpVoteMemeArgs = {
 
 export type MutationDownVoteMemeArgs = {
   memeId: Scalars['String'];
-};
-
-
-export type MutationRedisGetArgs = {
-  key: Scalars['String'];
 };
 
 
@@ -869,6 +922,46 @@ export type AddEmojiMutation = (
   & Pick<Mutation, 'addEmoji'>
 );
 
+export type InvestmentFragment = (
+  { __typename?: 'Investment' }
+  & Pick<Investment, 'id' | 'redditId' | 'betSize' | 'target' | 'percentile' | 'userId' | 'createdAt' | 'profitLoss' | 'type'>
+);
+
+export type InvestMutationVariables = Exact<{
+  betSize: Scalars['Int'];
+  redditId: Scalars['String'];
+  type: Scalars['String'];
+  target?: Maybe<Scalars['Float']>;
+}>;
+
+
+export type InvestMutation = (
+  { __typename?: 'Mutation' }
+  & { invest?: Maybe<(
+    { __typename?: 'Investment' }
+    & InvestmentFragment
+  )> }
+);
+
+export type MyInvestmentsQueryVariables = Exact<{
+  take: Scalars['Int'];
+  skip: Scalars['Int'];
+  order: Scalars['String'];
+}>;
+
+
+export type MyInvestmentsQuery = (
+  { __typename?: 'Query' }
+  & { myInvestments?: Maybe<(
+    { __typename?: 'PaginatedInvestments' }
+    & Pick<PaginatedInvestments, 'hasMore'>
+    & { items: Array<(
+      { __typename?: 'Investment' }
+      & InvestmentFragment
+    )> }
+  )> }
+);
+
 export type MyMemeFragment = (
   { __typename?: 'Meme' }
   & Pick<Meme, 'id' | 'ups' | 'downs' | 'ratio' | 'createdAt' | 'title' | 'url' | 'numComments' | 'isHive'>
@@ -1131,22 +1224,23 @@ export type RankingQuery = (
 
 export type RedditMemeFragment = (
   { __typename?: 'RedditMeme' }
-  & Pick<RedditMeme, 'id' | 'title' | 'subreddit' | 'url' | 'upvotes' | 'downvotes' | 'numComments'>
-  & { redditor: (
-    { __typename?: 'Redditor' }
-    & Pick<Redditor, 'id' | 'username'>
-  ) }
+  & Pick<RedditMeme, 'id' | 'title' | 'subreddit' | 'url' | 'redditId'>
+  & { investment?: Maybe<(
+    { __typename?: 'Investment' }
+    & InvestmentFragment
+  )> }
 );
 
-export type BestOfRedditQueryVariables = Exact<{
+export type LatestRedditQueryVariables = Exact<{
   take: Scalars['Int'];
   skip: Scalars['Int'];
+  view: Scalars['String'];
 }>;
 
 
-export type BestOfRedditQuery = (
+export type LatestRedditQuery = (
   { __typename?: 'Query' }
-  & { bestOfReddit: (
+  & { latestReddit: (
     { __typename?: 'PaginatedRedditMemes' }
     & Pick<PaginatedRedditMemes, 'hasMore'>
     & { items: Array<(
@@ -1156,14 +1250,20 @@ export type BestOfRedditQuery = (
   ) }
 );
 
-export type RedisGetMutationVariables = Exact<{
-  key: Scalars['String'];
-}>;
+export type GasPricesFragment = (
+  { __typename?: 'GasPrices' }
+  & Pick<GasPrices, 'fast' | 'fastest' | 'safeLow' | 'average' | 'block_time' | 'blockNum' | 'speed' | 'safeLowWait' | 'avgWait' | 'fastWait' | 'fastestWait'>
+);
+
+export type GasPricesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type RedisGetMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'redisGet'>
+export type GasPricesQuery = (
+  { __typename?: 'Query' }
+  & { gasPrices: (
+    { __typename?: 'GasPrices' }
+    & GasPricesFragment
+  ) }
 );
 
 export type MarketDataFragment = (
@@ -1428,6 +1528,19 @@ export type UsersQuery = (
   )> }
 );
 
+export type UserQueryVariables = Exact<{
+  userId: Scalars['String'];
+}>;
+
+
+export type UserQuery = (
+  { __typename?: 'Query' }
+  & { user?: Maybe<(
+    { __typename?: 'User' }
+    & UserFragment
+  )> }
+);
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1594,19 +1707,44 @@ export const UserRankFragmentDoc = gql`
 }
     ${UserFragmentDoc}
 ${RankFragmentDoc}`;
+export const InvestmentFragmentDoc = gql`
+    fragment investment on Investment {
+  id
+  redditId
+  betSize
+  target
+  percentile
+  userId
+  createdAt
+  profitLoss
+  type
+}
+    `;
 export const RedditMemeFragmentDoc = gql`
     fragment redditMeme on RedditMeme {
   id
   title
   subreddit
   url
-  upvotes
-  downvotes
-  numComments
-  redditor {
-    id
-    username
+  redditId
+  investment {
+    ...investment
   }
+}
+    ${InvestmentFragmentDoc}`;
+export const GasPricesFragmentDoc = gql`
+    fragment gasPrices on GasPrices {
+  fast
+  fastest
+  safeLow
+  average
+  block_time
+  blockNum
+  speed
+  safeLowWait
+  avgWait
+  fastWait
+  fastestWait
 }
     `;
 export const MarketDataFragmentDoc = gql`
@@ -1870,6 +2008,31 @@ export const AddEmojiDocument = gql`
 export function useAddEmojiMutation() {
   return Urql.useMutation<AddEmojiMutation, AddEmojiMutationVariables>(AddEmojiDocument);
 };
+export const InvestDocument = gql`
+    mutation Invest($betSize: Int!, $redditId: String!, $type: String!, $target: Float) {
+  invest(betSize: $betSize, redditId: $redditId, type: $type, target: $target) {
+    ...investment
+  }
+}
+    ${InvestmentFragmentDoc}`;
+
+export function useInvestMutation() {
+  return Urql.useMutation<InvestMutation, InvestMutationVariables>(InvestDocument);
+};
+export const MyInvestmentsDocument = gql`
+    query MyInvestments($take: Int!, $skip: Int!, $order: String!) {
+  myInvestments(take: $take, skip: $skip, order: $order) {
+    items {
+      ...investment
+    }
+    hasMore
+  }
+}
+    ${InvestmentFragmentDoc}`;
+
+export function useMyInvestmentsQuery(options: Omit<Urql.UseQueryArgs<MyInvestmentsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<MyInvestmentsQuery>({ query: MyInvestmentsDocument, ...options });
+};
 export const PostMemeDocument = gql`
     mutation PostMeme($title: String!, $postToHive: Boolean!) {
   postMeme(title: $title, postToHive: $postToHive) {
@@ -2047,9 +2210,9 @@ export const RankingDocument = gql`
 export function useRankingQuery(options: Omit<Urql.UseQueryArgs<RankingQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<RankingQuery>({ query: RankingDocument, ...options });
 };
-export const BestOfRedditDocument = gql`
-    query BestOfReddit($take: Int!, $skip: Int!) {
-  bestOfReddit(take: $take, skip: $skip) {
+export const LatestRedditDocument = gql`
+    query LatestReddit($take: Int!, $skip: Int!, $view: String!) {
+  latestReddit(take: $take, skip: $skip, view: $view) {
     items {
       ...redditMeme
     }
@@ -2058,17 +2221,19 @@ export const BestOfRedditDocument = gql`
 }
     ${RedditMemeFragmentDoc}`;
 
-export function useBestOfRedditQuery(options: Omit<Urql.UseQueryArgs<BestOfRedditQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<BestOfRedditQuery>({ query: BestOfRedditDocument, ...options });
+export function useLatestRedditQuery(options: Omit<Urql.UseQueryArgs<LatestRedditQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<LatestRedditQuery>({ query: LatestRedditDocument, ...options });
 };
-export const RedisGetDocument = gql`
-    mutation RedisGet($key: String!) {
-  redisGet(key: $key)
+export const GasPricesDocument = gql`
+    query gasPrices {
+  gasPrices {
+    ...gasPrices
+  }
 }
-    `;
+    ${GasPricesFragmentDoc}`;
 
-export function useRedisGetMutation() {
-  return Urql.useMutation<RedisGetMutation, RedisGetMutationVariables>(RedisGetDocument);
+export function useGasPricesQuery(options: Omit<Urql.UseQueryArgs<GasPricesQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<GasPricesQuery>({ query: GasPricesDocument, ...options });
 };
 export const MarketHistoryDocument = gql`
     query MarketHistory($take: Int!, $name: String!) {
@@ -2218,6 +2383,17 @@ export const UsersDocument = gql`
 
 export function useUsersQuery(options: Omit<Urql.UseQueryArgs<UsersQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<UsersQuery>({ query: UsersDocument, ...options });
+};
+export const UserDocument = gql`
+    query User($userId: String!) {
+  user(userId: $userId) {
+    ...user
+  }
+}
+    ${UserFragmentDoc}`;
+
+export function useUserQuery(options: Omit<Urql.UseQueryArgs<UserQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<UserQuery>({ query: UserDocument, ...options });
 };
 export const MeDocument = gql`
     query Me {

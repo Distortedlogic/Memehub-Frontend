@@ -13,7 +13,7 @@ export const AvatarLink: React.FC<AvatarLinkProps> = (props) => {
     <Avatar
       _hover={{ cursor: "pointer" }}
       border="1px solid white"
-      onClcik={() => router.push(`/user/${userId}`)}
+      onClcik={() => router.push(`/user/profile/${userId}`)}
       {...avatarProps}
     />
   );
