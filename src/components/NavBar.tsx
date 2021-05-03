@@ -177,8 +177,8 @@ const Login: React.FC<LoginProps> = () => {
             <MenuItem icon="wallet" label="Wallet" route="/user/wallet/me" />
             <MenuItem
               icon="portfolio"
-              label="Portfolio"
-              route="/user/portfolio/me"
+              label="Trade History"
+              route="/user/trade-history/me"
             />
             <MenuItem
               icon="logout"

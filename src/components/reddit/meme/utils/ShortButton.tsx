@@ -1,4 +1,5 @@
 import { Button, ButtonProps } from "@chakra-ui/button";
+import { Checkbox } from "@chakra-ui/checkbox";
 import { Flex, Text } from "@chakra-ui/layout";
 import {
   NumberDecrementStepper,
@@ -16,6 +17,7 @@ import {
 } from "@chakra-ui/popover";
 import { Table, Tbody, Td, Tr } from "@chakra-ui/table";
 import { useToast } from "@chakra-ui/toast";
+import { Tooltip } from "@chakra-ui/tooltip";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
@@ -96,58 +98,77 @@ export const ShortButton: React.FC<ShortButtonProps> = (props) => {
         await short(values.betSize);
       }}
     >
-      {({ isSubmitting, values: { betSize }, setFieldValue }) => (
-        <Form>
-          <Flex direction="column">
-            <Flex mt={1} justifyContent="center" alignItems="center">
-              <Text>Betting this meme is in the bottom half.</Text>
+      {({ isSubmitting, values: { betSize }, setFieldValue }) => {
+        const isYolo = betSize === meData?.me?.gbp;
+        return (
+          <Form>
+            <Flex direction="column">
+              <Flex mt={1} justifyContent="center" alignItems="center">
+                <Text>Betting this meme is in the bottom half.</Text>
+              </Flex>
+              <Flex mt={1} justifyContent="center" alignItems="center">
+                <Text>WARNING: Shorting can be dangerous.</Text>
+              </Flex>
+              <Flex m={1} justifyContent="space-between" alignItems="center">
+                <Text>Bet Size in GBP</Text>
+                <Checkbox
+                  isChecked={isYolo}
+                  onChange={() => {
+                    isYolo
+                      ? setFieldValue("betSize", 5)
+                      : setFieldValue("betSize", meData?.me?.gbp);
+                  }}
+                >
+                  <Tooltip
+                    hasArrow
+                    label="Bet it all, and get a 2x multiplier!"
+                  >
+                    <Text>Yolo</Text>
+                  </Tooltip>
+                </Checkbox>
+              </Flex>
+              <NumberInput
+                allowMouseWheel
+                onChange={(valueString) =>
+                  setFieldValue("betSize", parseInt(valueString))
+                }
+                defaultValue={betSize}
+                value={betSize}
+                min={5}
+                step={5}
+                max={meData?.me?.gbp}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Table>
+                <Tbody>
+                  <Tr>
+                    <Td>Potential Profit</Td>
+                    <Td isNumeric>{betSize * (isYolo ? 2 : 1)} GBP</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Current Balance</Td>
+                    <Td isNumeric>{meData?.me?.gbp} GBP</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+              <Button
+                isLoading={isSubmitting}
+                mt={2}
+                w="100%"
+                type="submit"
+                colorScheme="red"
+              >
+                {isYolo ? "YOLO!" : "Short"}
+              </Button>
             </Flex>
-            <Flex mt={1} justifyContent="center" alignItems="center">
-              <Text>WARNING: Shorting can be dangerous.</Text>
-            </Flex>
-            <Flex mt={1} justifyContent="center" alignItems="center">
-              <Text>Bet Size in GBP</Text>
-            </Flex>
-            <NumberInput
-              allowMouseWheel
-              onChange={(valueString) =>
-                setFieldValue("betSize", parseInt(valueString))
-              }
-              defaultValue={betSize}
-              min={5}
-              step={5}
-              max={meData?.me?.gbp}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-            <Table>
-              <Tbody>
-                <Tr>
-                  <Td>Potential Profit</Td>
-                  <Td isNumeric>{betSize} GBP</Td>
-                </Tr>
-                <Tr>
-                  <Td>Current Balance</Td>
-                  <Td isNumeric>{meData?.me?.gbp} GBP</Td>
-                </Tr>
-              </Tbody>
-            </Table>
-            <Button
-              isLoading={isSubmitting}
-              mt={2}
-              w="100%"
-              type="submit"
-              colorScheme="red"
-            >
-              Short
-            </Button>
-          </Flex>
-        </Form>
-      )}
+          </Form>
+        );
+      }}
     </Formik>
   );
   return (

@@ -1,6 +1,5 @@
 import { Button } from "@chakra-ui/button";
 import { useDisclosure } from "@chakra-ui/hooks";
-import { Image } from "@chakra-ui/image";
 import { Badge, Box, Flex, FlexProps, Text } from "@chakra-ui/layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
@@ -13,6 +12,7 @@ import { AvatarLink } from "src/components/utils/AvatarLink";
 import { MemeFragment, useMeQuery, UserFragment } from "src/generated/graphql";
 import { ratioToColorGrade } from "src/utils/functions";
 import { ADMIN_NAME } from "../../utils/constants";
+import { MemeModal } from "./MemeModal";
 import { DeleteButton } from "./utils/DeleteButton";
 import { DownvoteButton } from "./utils/DownvoteButton";
 import { HiveVoteButtons } from "./utils/HiveVoteButtons";
@@ -42,7 +42,7 @@ export const MemeList: React.FC<MemeListProps> = (props) => {
             justifyContent="center"
             alignItems="center"
           >
-            <Image rounded="md" w="150px" src={meme.url} />
+            <MemeModal rounded="md" w="150px" url={meme.url} />
           </Flex>
           <Text fontSize="sm">{dayjs(meme.createdAt).fromNow()}</Text>
         </Flex>

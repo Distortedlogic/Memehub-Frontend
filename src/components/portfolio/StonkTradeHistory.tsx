@@ -20,7 +20,7 @@ interface TradeHistoryProps extends FlexProps {
   userId: string;
 }
 const take = 15;
-export const TradeHistory: React.FC<TradeHistoryProps> = (props) => {
+export const StonkTradeHistory: React.FC<TradeHistoryProps> = (props) => {
   const { userId, ...flexProps } = props;
   const [skip, setSkip] = useState(0);
   const loadMore = () => setSkip(skip + take);
@@ -47,7 +47,7 @@ export const TradeHistory: React.FC<TradeHistoryProps> = (props) => {
         {...flexProps}
       >
         <Table variant="simple">
-          <TableCaption placement="top">Trade History</TableCaption>
+          <TableCaption placement="top">Stonk Trade History</TableCaption>
           <Thead>
             <Tr>
               <Th>Created</Th>

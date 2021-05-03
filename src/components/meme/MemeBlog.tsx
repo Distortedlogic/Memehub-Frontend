@@ -1,6 +1,5 @@
 import { Button } from "@chakra-ui/button";
 import { useDisclosure } from "@chakra-ui/hooks";
-import { Image } from "@chakra-ui/image";
 import { Badge, Box, BoxProps, Flex, Text } from "@chakra-ui/layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
@@ -21,6 +20,7 @@ import { ADMIN_NAME } from "src/utils/constants";
 import { ratioToColorGrade } from "src/utils/functions";
 import { AddEmoji } from "../emojis/AddEmoji";
 import { EmojiButton } from "../emojis/EmojiButton";
+import { MemeModal } from "./MemeModal";
 import { DeleteButton } from "./utils/DeleteButton";
 import { DownvoteButton } from "./utils/DownvoteButton";
 import { HiveVoteButtons } from "./utils/HiveVoteButtons";
@@ -49,7 +49,7 @@ export const MemeBlog: React.FC<MemeBlogProps> = (props) => {
         alignItems="center"
         p={2}
       >
-        <Image rounded="md" w="auto" src={meme.url} />
+        <MemeModal rounded="md" w="auto" url={meme.url} />
       </Flex>
       <BottomBar user={user} meme={meme} />
     </Flex>

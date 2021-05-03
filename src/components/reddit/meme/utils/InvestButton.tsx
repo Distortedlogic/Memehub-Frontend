@@ -1,4 +1,5 @@
 import { Button, ButtonProps } from "@chakra-ui/button";
+import { Checkbox } from "@chakra-ui/checkbox";
 import { Flex, Text } from "@chakra-ui/layout";
 import {
   NumberDecrementStepper,
@@ -16,6 +17,7 @@ import {
 } from "@chakra-ui/popover";
 import { Table, Tbody, Td, Tr } from "@chakra-ui/table";
 import { useToast } from "@chakra-ui/toast";
+import { Tooltip } from "@chakra-ui/tooltip";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
@@ -101,74 +103,92 @@ export const InvestButton: React.FC<InvestButtonProps> = (props) => {
         await buy(values.betSize, values.target);
       }}
     >
-      {({ isSubmitting, values: { betSize, target }, setFieldValue }) => (
-        <Form>
-          <Flex direction="column">
-            <Flex mt={1} justifyContent="center" alignItems="center">
-              <Text>Bet Size in GBP</Text>
+      {({ isSubmitting, values: { betSize, target }, setFieldValue }) => {
+        const isYolo = betSize === meData?.me?.gbp;
+        return (
+          <Form>
+            <Flex direction="column">
+              <Flex m={1} justifyContent="space-between" alignItems="center">
+                <Text>Bet Size in GBP</Text>
+                <Tooltip label="Bet it all, and get a 2x multiplier!">
+                  <Checkbox
+                    isChecked={isYolo}
+                    onChange={() => {
+                      isYolo
+                        ? setFieldValue("betSize", 5)
+                        : setFieldValue("betSize", meData?.me?.gbp);
+                    }}
+                  >
+                    <Text>Yolo</Text>
+                  </Checkbox>
+                </Tooltip>
+              </Flex>
+              <NumberInput
+                allowMouseWheel
+                onChange={(valueString) =>
+                  setFieldValue("betSize", parseInt(valueString))
+                }
+                defaultValue={betSize}
+                value={betSize}
+                min={5}
+                step={5}
+                max={meData?.me?.gbp}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Flex mt={2} justifyContent="center" alignItems="center">
+                <Text>This meme is better than XX% of memes</Text>
+              </Flex>
+              <NumberInput
+                allowMouseWheel
+                onChange={(valueString) =>
+                  setFieldValue("target", parseFloat(valueString))
+                }
+                defaultValue={target}
+                min={0.5}
+                max={0.99}
+                step={0.01}
+                mt={2}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Table>
+                <Tbody>
+                  <Tr>
+                    <Td>Potential Profit</Td>
+                    <Td isNumeric>
+                      {Math.round((betSize * target) / (1 - target)) *
+                        (isYolo ? 2 : 1)}{" "}
+                      GBP
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Current Balance</Td>
+                    <Td isNumeric>{meData?.me?.gbp} GBP</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+              <Button
+                isLoading={isSubmitting}
+                mt={2}
+                w="100%"
+                type="submit"
+                colorScheme="green"
+              >
+                {isYolo ? "YOLO!" : "Invest"}
+              </Button>
             </Flex>
-            <NumberInput
-              allowMouseWheel
-              onChange={(valueString) =>
-                setFieldValue("betSize", parseInt(valueString))
-              }
-              defaultValue={betSize}
-              min={5}
-              step={5}
-              max={meData?.me?.gbp}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-            <Flex mt={2} justifyContent="center" alignItems="center">
-              <Text>This meme is better than XX% of memes</Text>
-            </Flex>
-            <NumberInput
-              allowMouseWheel
-              onChange={(valueString) =>
-                setFieldValue("target", parseFloat(valueString))
-              }
-              defaultValue={target}
-              min={0.5}
-              max={0.99}
-              step={0.01}
-              mt={2}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-            <Table>
-              <Tbody>
-                <Tr>
-                  <Td>Potential Profit</Td>
-                  <Td isNumeric>
-                    {Math.round((betSize * target) / (1 - target))} GBP
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Current Balance</Td>
-                  <Td isNumeric>{meData?.me?.gbp} GBP</Td>
-                </Tr>
-              </Tbody>
-            </Table>
-            <Button
-              isLoading={isSubmitting}
-              mt={2}
-              w="100%"
-              type="submit"
-              colorScheme="green"
-            >
-              Invest
-            </Button>
-          </Flex>
-        </Form>
-      )}
+          </Form>
+        );
+      }}
     </Formik>
   );
   return (

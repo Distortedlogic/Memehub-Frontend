@@ -32,6 +32,7 @@ export const normalizedCache = cacheExchange({
       ranking: Pagination("PaginatedRanks"),
       stonks: Pagination("PaginatedStonks"),
       latestReddit: Pagination("PaginatedRedditMemes"),
+      userInvestments: Pagination("PaginatedInvestments"),
     },
   },
   updates: {

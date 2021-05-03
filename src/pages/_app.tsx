@@ -4,8 +4,9 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { StoreProvider } from "easy-peasy";
 import Head from "next/head";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Container } from "src/components/utils/Container";
+import { useCurrentSeasonQuery } from "src/generated/graphql";
 import { globalStore } from "src/store/store";
 import theme from "../theme";
 
@@ -17,6 +18,14 @@ const MyApp = ({
   Component: React.FC;
   pageProps: React.ComponentProps<any>;
 }) => {
+  const [{ data, error }] = useCurrentSeasonQuery();
+  if (error) console.log(error);
+  useEffect(() => {
+    if (data?.currentSeason) {
+      globalStore.getActions().settings.setSeason(data.currentSeason);
+    }
+    return () => {};
+  }, [data]);
   return (
     <Fragment>
       <Head>

@@ -143,19 +143,6 @@ export const MiniNavBar: React.FC<MiniNavBarProps> = () => {
           justifyContent="space-between"
           alignItems="center"
           mr={12}
-          onClick={() => router.push("/market/stonks")}
-        >
-          <Image
-            height="25px"
-            src={BUCKET_BASE_URL + "/icons/stonkMarket.png"}
-          />
-          <Text mx={2}>Stonks</Text>
-        </Flex>
-        <Flex
-          _hover={{ cursor: "pointer" }}
-          justifyContent="space-between"
-          alignItems="center"
-          mr={12}
           onClick={() => router.push("/day-trading/latest")}
         >
           <Image

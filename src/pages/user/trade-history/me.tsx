@@ -2,7 +2,7 @@ import { Flex } from "@chakra-ui/layout";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
-import { Profile } from "src/components/user/Profile";
+import { DayTradeHistory } from "src/components/portfolio/DayTradeHistory";
 import { useIsAuth } from "src/hooks/isAuth";
 import DoubleColLayout from "src/pages/_doubleColLayout";
 import { urqlClient } from "src/urql/urqlClient";
@@ -29,7 +29,11 @@ const me: React.FC<meProps> = () => {
       </DoubleColLayout>
     );
   }
-  return <Profile user={data.me} />;
+  return (
+    <DoubleColLayout>
+      <DayTradeHistory pt={4} m={2} userId={data.me.id} />
+    </DoubleColLayout>
+  );
 };
 
 export default withUrqlClient(urqlClient)(me);

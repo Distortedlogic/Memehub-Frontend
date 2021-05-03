@@ -3,15 +3,15 @@ import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
 import { Profile } from "src/components/user/Profile";
+import { useUserQuery } from "src/generated/graphql";
 import { urqlClient } from "src/urql/urqlClient";
-import { useUserProfileQuery } from "../../../generated/graphql";
 
 interface UserProfileProps {}
 
 const UserProfile: React.FC<UserProfileProps> = () => {
   const toast = useToast();
   const router = useRouter();
-  const [{ data, error, fetching }] = useUserProfileQuery({
+  const [{ data, error, fetching }] = useUserQuery({
     variables: { userId: router.query.userId as string },
   });
   if (error) {

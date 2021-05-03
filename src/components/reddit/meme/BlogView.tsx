@@ -1,10 +1,10 @@
 import { Button } from "@chakra-ui/button";
-import { Image } from "@chakra-ui/image";
 import { Flex, FlexProps, Text } from "@chakra-ui/layout";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import ellipsize from "ellipsize";
 import React, { useState } from "react";
+import { MemeModal } from "src/components/meme/MemeModal";
 import { InvestmentFragment, RedditMemeFragment } from "src/generated/graphql";
 import { InvestButton } from "./utils/InvestButton";
 import { ShortButton } from "./utils/ShortButton";
@@ -32,7 +32,7 @@ export const BlogView: React.FC<BlogViewProps> = (props) => {
         alignItems="center"
         p={2}
       >
-        <Image rounded="md" w="auto" src={meme.url} />
+        <MemeModal rounded="md" w="auto" url={meme.url} />
       </Flex>
       {investmentData ? (
         <Flex mt={2} justifyContent="center" alignitems="center">

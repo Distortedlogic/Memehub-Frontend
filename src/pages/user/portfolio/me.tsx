@@ -1,8 +1,6 @@
-import { Divider, Flex } from "@chakra-ui/layout";
 import { withUrqlClient } from "next-urql";
 import React from "react";
-import { Positions } from "src/components/portfolio/Positions";
-import { TradeHistory } from "src/components/portfolio/TradeHistory";
+import { Portfolio } from "src/components/portfolio/Portfolio";
 import { useIsAuth } from "src/hooks/isAuth";
 import { urqlClient } from "src/urql/urqlClient";
 import { DoubleColLayout } from "../../_doubleColLayout";
@@ -21,11 +19,7 @@ const portfolio: React.FC<portfolioProps> = () => {
   const { me } = data;
   return (
     <DoubleColLayout>
-      <Flex mb={4} pl={6} minHeight="80vh" direction="column">
-        <Positions maxHeight="60vh" overflow="auto" userId={me.id} />
-        <Divider my={4} />
-        <TradeHistory maxHeight="60vh" overflow="auto" userId={me.id} />
-      </Flex>
+      <Portfolio mb={4} pl={6} userId={me.id} />
     </DoubleColLayout>
   );
 };

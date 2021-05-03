@@ -14,17 +14,17 @@ import {
   Tooltip,
   Tr,
 } from "@chakra-ui/react";
-import Humanize from "humanize-plus";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useRankingQuery } from "src/generated/graphql";
+import { useInvestmentStatsQuery } from "src/generated/graphql";
 import { BUCKET_BASE_URL } from "src/utils/constants";
 
-const idx_tf: Record<number, string> = {
-  0: "day",
-  1: "week",
-  2: "month",
-  3: "ever",
+const idx_tf: Record<number, string[]> = {
+  0: ["day", "Daily"],
+  1: ["week", "Weekly"],
+  2: ["season", "Season"],
+  3: ["bestTrade", "Best Trade"],
+  4: ["largestYolo", "Largest Yolo"],
 };
 
 const mod = Object.keys(idx_tf).length;
@@ -35,6 +35,11 @@ export const Leaderboards: React.FC<LeaderboardsProps> = (flexProps) => {
   const [index, setIndex] = useState(0);
   const [userCalled, setUserCalled] = useState(false);
   const [leaderboard, setLeaderboard] = useState(<></>);
+  const [{ data, fetching, error }] = useInvestmentStatsQuery();
+  if (error) console.log(error);
+  if (fetching || error || !data) {
+  }
+  console.log("data", data);
   let id: any;
   useEffect(() => {
     setLeaderboard(
@@ -42,7 +47,6 @@ export const Leaderboards: React.FC<LeaderboardsProps> = (flexProps) => {
         index={index}
         setIndex={setIndex}
         setUserCalled={setUserCalled}
-        timeFrame={idx_tf[index]}
         {...flexProps}
       />
     );
@@ -63,31 +67,14 @@ export const Leaderboards: React.FC<LeaderboardsProps> = (flexProps) => {
 interface LeaderboardProps extends FlexProps {
   index: number;
   setIndex: React.Dispatch<React.SetStateAction<number>>;
-  timeFrame: string;
   setUserCalled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Leaderboard: React.FC<LeaderboardProps> = (props) => {
-  const { index, setIndex, setUserCalled, timeFrame, ...flexProps } = props;
-  const [isMhp, setIsMhp] = useState(true);
-  useEffect(() => {
-    if (!index) setIsMhp(!isMhp);
-  }, [index]);
-  const [{ data, error, fetching }] = useRankingQuery({
-    variables: { timeFrame, skip: 0, take: 3, isMhp },
-  });
+  const { index, setIndex, setUserCalled, ...flexProps } = props;
+  const [timeFrame, title] = idx_tf[index];
   const router = useRouter();
-  if (error) console.log(error);
-  if (fetching || !data?.ranking?.items || data.ranking.items.length === 0)
-    return <Flex h="40vh"></Flex>;
-  const ranks = data.ranking?.items;
-  let titles: Record<string, string> = {
-    day: "Daily",
-    week: "Weekly",
-    month: "Month",
-    ever: "Ever",
-  };
-  const title = titles[timeFrame];
+  if (false) return <Flex h="40vh"></Flex>;
   return (
     <Flex p={2} maxWidth="100%" direction="column" {...flexProps}>
       <Text textAlign="center" fontSize="20px">
@@ -114,7 +101,7 @@ const Leaderboard: React.FC<LeaderboardProps> = (props) => {
           />
         </Flex>
         <Text mr={4} fontSize="20px">
-          {isMhp ? "MHP" : "GBP"}
+          GBP
         </Text>
       </Flex>
       <Table>
@@ -124,40 +111,41 @@ const Leaderboard: React.FC<LeaderboardProps> = (props) => {
             <Th></Th>
           </Tr>
         </Thead>
-        <Tbody>
-          {ranks.map((rank) => (
-            <Tr
-              key={rank.user.id}
-              _hover={{ backgroundColor: "gray.800", cursor: "pointer" }}
-              onClick={() => router.push(`/user/profile/${rank.user.id}`)}
-            >
-              <Td>
-                <Flex alignItems="center">
-                  <Avatar
-                    border="1px solid white"
-                    size="sm"
-                    src={rank.user.avatar}
-                  />
-                  <Text ml={2}>{rank.user.username}</Text>
-                </Flex>
-              </Td>
-              <Td>
-                <Tooltip label={`${isMhp ? rank.mhp : rank.gbp}`}>
-                  <Text textAlign="center">
-                    {isMhp
-                      ? Humanize.compactInteger(rank.mhp)
-                      : Humanize.compactInteger(rank.gbp)}
-                  </Text>
-                </Tooltip>
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
+        <MhpRanking index={index} />
       </Table>
       <Button roundedTop={0} onClick={() => router.push("/user/rankings")}>
         <Image height="25px" src={BUCKET_BASE_URL + "/icons/rank.png"} />
         <Text ml={4}>View Rankings</Text>
       </Button>
     </Flex>
+  );
+};
+
+interface MhpRankingProps {
+  index: number;
+}
+
+export const MhpRanking: React.FC<MhpRankingProps> = (props) => {
+  const { index } = props;
+  const [timeFrame] = idx_tf[index];
+
+  const router = useRouter();
+  if (false) return <Flex h="40vh"></Flex>;
+  return (
+    <Tbody>
+      <Tr _hover={{ backgroundColor: "gray.800", cursor: "pointer" }}>
+        <Td>
+          <Flex alignItems="center">
+            <Avatar border="1px solid white" size="sm" />
+            <Text ml={2}></Text>
+          </Flex>
+        </Td>
+        <Td>
+          <Tooltip label={``}>
+            <Text textAlign="center"></Text>
+          </Tooltip>
+        </Td>
+      </Tr>
+    </Tbody>
   );
 };
