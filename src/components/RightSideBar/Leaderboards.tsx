@@ -72,7 +72,7 @@ interface LeaderboardProps extends FlexProps {
 
 const Leaderboard: React.FC<LeaderboardProps> = (props) => {
   const { index, setIndex, setUserCalled, ...flexProps } = props;
-  const [timeFrame, title] = idx_tf[index];
+  const [_, title] = idx_tf[index];
   const router = useRouter();
   if (false) return <Flex h="40vh"></Flex>;
   return (
@@ -125,11 +125,7 @@ interface MhpRankingProps {
   index: number;
 }
 
-export const MhpRanking: React.FC<MhpRankingProps> = (props) => {
-  const { index } = props;
-  const [timeFrame] = idx_tf[index];
-
-  const router = useRouter();
+export const MhpRanking: React.FC<MhpRankingProps> = () => {
   if (false) return <Flex h="40vh"></Flex>;
   return (
     <Tbody>
