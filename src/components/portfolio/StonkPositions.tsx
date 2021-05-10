@@ -19,7 +19,7 @@ interface PositionsProps extends TableProps {
   userId: string;
 }
 const take = 16;
-export const Positions: React.FC<PositionsProps> = (props) => {
+export const StonkPositions: React.FC<PositionsProps> = (props) => {
   const { userId, ...flexProps } = props;
   const [skip, setSkip] = useState(0);
   const loadMore = () => setSkip(skip + take);

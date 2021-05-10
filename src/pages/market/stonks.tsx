@@ -20,18 +20,23 @@ const Stonks: React.FC<StonksProps> = () => {
     <NavLayout>
       <Grid templateColumns="3fr 1fr" w="100%" backgroundColor="black">
         <StonkGrid order={order} onlyPositions={onlyPositions} />
-        <GridItem pt={2} mr={2} position="sticky" top="0">
-          <Flex direction="column" w="100%">
+        <GridItem pt={1} mr={2} position="sticky" top="0">
+          <Flex direction="column" my={1} w="100%">
             <Button onClick={() => router.push("/market/info")}>
               Sonk Market Info
             </Button>
           </Flex>
-          <Flex justifyContent="space-between" mt={2} w="100%">
+          <Flex justifyContent="space-between" my={1} w="100%">
             <Button onClick={() => setOrder("marketcap")} w="49%">
               Marketcap
             </Button>
             <Button onClick={() => setOrder("price")} w="49%">
               Price
+            </Button>
+          </Flex>
+          <Flex my={1} direction="column" w="100%">
+            <Button onClick={() => router.push("/market/stats")}>
+              Sonk Market Stats
             </Button>
           </Flex>
           <Flex justifyContent="center" alignItems="center">

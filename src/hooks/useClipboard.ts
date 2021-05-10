@@ -21,7 +21,6 @@ export const useClipboard = () => {
     } catch (error) {
       found = true;
     }
-    console.log("found", found);
     if (found) {
       const file = new File([imgBlob!], "clipboard.png", {
         type: imgBlob!.type,

@@ -31,6 +31,8 @@ export const normalizedCache = cacheExchange({
       userMemes: Pagination("PaginatedMemes"),
       ranking: Pagination("PaginatedRanks"),
       stonks: Pagination("PaginatedStonks"),
+      latestReddit: Pagination("PaginatedRedditMemes"),
+      userInvestments: Pagination("PaginatedInvestments"),
     },
   },
   updates: {

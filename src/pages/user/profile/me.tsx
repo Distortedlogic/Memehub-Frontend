@@ -3,14 +3,14 @@ import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
 import { Profile } from "src/components/user/Profile";
-import { useMyProfileQuery } from "src/generated/graphql";
+import { useIsAuth } from "src/hooks/isAuth";
+import DoubleColLayout from "src/pages/_doubleColLayout";
 import { urqlClient } from "src/urql/urqlClient";
-import { DoubleColLayout } from "../_doubleColLayout";
 
 interface meProps {}
 
 const me: React.FC<meProps> = () => {
-  const [{ data, error, fetching }] = useMyProfileQuery();
+  const [{ data, error, fetching }] = useIsAuth();
   const router = useRouter();
   if (error) {
     console.log("error", error);

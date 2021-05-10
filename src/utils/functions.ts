@@ -1,5 +1,6 @@
 import { SHA256 } from "crypto-js";
 import { compress, EImageType } from "image-conversion";
+import { StonkFragment } from "src/generated/graphql";
 import { FieldError } from "./../generated/graphql";
 export const getHash = async (text: string) => SHA256(text).toString();
 
@@ -68,4 +69,37 @@ export const optimizeImageFile = async (
   return new File([blob], `${hash}.${ext}`, {
     type: `image/${ext}`,
   });
+};
+
+export const do_binning = (arr: StonkFragment[], isMarketcap: boolean) => {
+  const interval = isMarketcap ? 10000 : 1000;
+  const max =
+    Math.ceil(
+      Math.max(
+        ...arr.map((stonk) => (isMarketcap ? stonk.marketcap : stonk.price))
+      ) / 1000
+    ) * 1000;
+  const min = 0;
+  var numOfBuckets = (max - min) / interval;
+  const bins = Array.from(Array(numOfBuckets).keys()).map((idx) => ({
+    minNum: idx,
+    maxNum: idx + interval,
+    count: 0,
+  }));
+  //Loop through data and add to bin's count
+  for (var i = 0; i < arr.length; i++) {
+    var item = arr[i];
+    for (var j = 0; j < bins.length; j++) {
+      var bin = bins[j];
+      if (
+        isMarketcap
+          ? item.marketcap > bin.minNum && item.marketcap <= bin.maxNum
+          : item.price > bin.minNum && item.price <= bin.maxNum
+      ) {
+        bin.count++;
+        break; // An item can only be in one bin.
+      }
+    }
+  }
+  return bins;
 };
