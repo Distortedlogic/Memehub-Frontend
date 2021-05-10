@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/button";
 import { Flex, SimpleGrid } from "@chakra-ui/layout";
 import React from "react";
-import { useInvestmentStatsQuery } from "src/generated/graphql";
+import { useUserInvestmentStatsQuery } from "src/generated/graphql";
 
 interface InvestmentStatsProps {
   userId: string;
@@ -20,7 +20,7 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = (props) => {
     setTimeframe,
     ...flexProps
   } = props;
-  const [{ data, fetching, error }] = useInvestmentStatsQuery({
+  const [{ data, fetching, error }] = useUserInvestmentStatsQuery({
     variables: { timeframe, userId, typeFilter, season },
   });
   if (error) console.log(error);
@@ -50,17 +50,17 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = (props) => {
         </Button>
       </Flex>
       <SimpleGrid px={4} minChildWidth="250px" spacing={2} {...flexProps}>
-        <Button size="sm">{`Best Trade: ${data.investmentStats?.bestTrade} GBP`}</Button>
-        <Button size="sm">{`Worst Trade: ${data.investmentStats?.worstTrade} GBP`}</Button>
-        <Button size="sm">{`Profit/Loss: ${data.investmentStats?.profitLoss} GBP`}</Button>
-        <Button size="sm">{`Total Number of Trades: ${data.investmentStats?.numTrades}`}</Button>
-        <Button size="sm">{`Number of Good Trades: ${data.investmentStats?.numGoodTrades}`}</Button>
+        <Button size="sm">{`Best Trade: ${data.userInvestmentStats?.bestTrade} GBP`}</Button>
+        <Button size="sm">{`Worst Trade: ${data.userInvestmentStats?.worstTrade} GBP`}</Button>
+        <Button size="sm">{`Profit/Loss: ${data.userInvestmentStats?.profitLoss} GBP`}</Button>
+        <Button size="sm">{`Total Number of Trades: ${data.userInvestmentStats?.numTrades}`}</Button>
+        <Button size="sm">{`Number of Good Trades: ${data.userInvestmentStats?.numGoodTrades}`}</Button>
         <Button size="sm">{`Good Trade Ratio: ${
-          data.investmentStats?.numTrades &&
-          data.investmentStats?.numTrades !== 0
+          data.userInvestmentStats?.numTrades &&
+          data.userInvestmentStats?.numTrades !== 0
             ? (
-                data.investmentStats.numGoodTrades /
-                data.investmentStats.numTrades
+                data.userInvestmentStats.numGoodTrades /
+                data.userInvestmentStats.numTrades
               ).toFixed(2)
             : 0
         }`}</Button>

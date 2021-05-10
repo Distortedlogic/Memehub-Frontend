@@ -218,6 +218,7 @@ export type User = {
   avatar: Scalars['String'];
   gbp: Scalars['Int'];
   trades: Array<Trade>;
+  investments: Array<Investment>;
   memes: Array<Meme>;
   comments: Array<Comment>;
   userMemeEmojis: Array<UserMemeEmoji>;
@@ -262,6 +263,59 @@ export type Market = {
   numUpvotes: Scalars['Int'];
 };
 
+
+export type Investment = {
+  __typename?: 'Investment';
+  id: Scalars['String'];
+  season: Scalars['Int'];
+  redditId: Scalars['String'];
+  type: Scalars['String'];
+  betSize: Scalars['Int'];
+  upvotes: Scalars['Int'];
+  target?: Maybe<Scalars['Float']>;
+  percentile: Scalars['Float'];
+  profitLoss: Scalars['Int'];
+  isYolo: Scalars['Boolean'];
+  userId: Scalars['String'];
+  user: User;
+  createdAt: Scalars['DateTime'];
+  meme: RedditMeme;
+};
+
+export type RedditMeme = {
+  __typename?: 'RedditMeme';
+  id: Scalars['Int'];
+  username: Scalars['String'];
+  redditId: Scalars['String'];
+  subreddit: Scalars['String'];
+  title: Scalars['String'];
+  url: Scalars['String'];
+  memeText: Scalars['String'];
+  isATemplate: Scalars['Boolean'];
+  memeClf: Scalars['String'];
+  memeClfCorrect: Scalars['Boolean'];
+  stonk: Scalars['Boolean'];
+  stonkCorrect: Scalars['Boolean'];
+  stonkOfficial: Scalars['String'];
+  isATemplateOfficial: Scalars['Boolean'];
+  version: Scalars['String'];
+  percentile?: Maybe<Scalars['Float']>;
+  timestamp: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  upvoteRatio: Scalars['Float'];
+  upvotes: Scalars['Int'];
+  downvotes: Scalars['Int'];
+  numComments: Scalars['Int'];
+  redditorId: Scalars['Int'];
+  redditor: Redditor;
+  investment?: Maybe<Investment>;
+};
+
+export type Redditor = {
+  __typename?: 'Redditor';
+  id: Scalars['Int'];
+  username: Scalars['String'];
+};
 
 export type Meme = {
   __typename?: 'Meme';
@@ -343,59 +397,6 @@ export type PaginatedInvestments = {
   __typename?: 'PaginatedInvestments';
   items: Array<Investment>;
   hasMore: Scalars['Boolean'];
-};
-
-export type Investment = {
-  __typename?: 'Investment';
-  id: Scalars['String'];
-  season: Scalars['Int'];
-  redditId: Scalars['String'];
-  type: Scalars['String'];
-  betSize: Scalars['Int'];
-  upvotes: Scalars['Int'];
-  target?: Maybe<Scalars['Float']>;
-  percentile: Scalars['Float'];
-  profitLoss: Scalars['Int'];
-  isYolo: Scalars['Boolean'];
-  userId: Scalars['String'];
-  user: User;
-  createdAt: Scalars['DateTime'];
-  meme: RedditMeme;
-};
-
-export type RedditMeme = {
-  __typename?: 'RedditMeme';
-  id: Scalars['Int'];
-  username: Scalars['String'];
-  redditId: Scalars['String'];
-  subreddit: Scalars['String'];
-  title: Scalars['String'];
-  url: Scalars['String'];
-  memeText: Scalars['String'];
-  isATemplate: Scalars['Boolean'];
-  memeClf: Scalars['String'];
-  memeClfCorrect: Scalars['Boolean'];
-  stonk: Scalars['Boolean'];
-  stonkCorrect: Scalars['Boolean'];
-  stonkOfficial: Scalars['String'];
-  isATemplateOfficial: Scalars['Boolean'];
-  version: Scalars['String'];
-  percentile?: Maybe<Scalars['Float']>;
-  timestamp: Scalars['Int'];
-  createdAt: Scalars['DateTime'];
-  upvoteRatio: Scalars['Float'];
-  upvotes: Scalars['Int'];
-  downvotes: Scalars['Int'];
-  numComments: Scalars['Int'];
-  redditorId: Scalars['Int'];
-  redditor: Redditor;
-  investment?: Maybe<Investment>;
-};
-
-export type Redditor = {
-  __typename?: 'Redditor';
-  id: Scalars['Int'];
-  username: Scalars['String'];
 };
 
 export type UserInvestmentStats = {
