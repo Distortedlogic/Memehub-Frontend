@@ -73,6 +73,7 @@ interface LeaderboardProps extends FlexProps {
 const Leaderboard: React.FC<LeaderboardProps> = (props) => {
   const { index, setIndex, setUserCalled, ...flexProps } = props;
   const [_, title] = idx_tf[index];
+  _;
   const router = useRouter();
   if (false) return <Flex h="40vh"></Flex>;
   return (
