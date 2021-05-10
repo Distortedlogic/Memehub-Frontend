@@ -14,7 +14,7 @@ const UserWallet: React.FC<WalletProps> = () => {
   if (!router.query.userId) {
     router.push("/onboarding/hiveLogin");
   }
-  const userId = router.query.userId as string;
+  const userId = router.query.userId as string | "";
   const [{ data, fetching, error }] = useUserQuery({ variables: { userId } });
   if (error) console.log(error);
   if (fetching || error || !data?.user)

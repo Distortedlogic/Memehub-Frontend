@@ -11,8 +11,9 @@ interface UserProfileProps {}
 const UserProfile: React.FC<UserProfileProps> = () => {
   const toast = useToast();
   const router = useRouter();
+  const userId = router.query.userId as string | "";
   const [{ data, error, fetching }] = useUserQuery({
-    variables: { userId: router.query.userId as string },
+    variables: { userId },
   });
   if (error) {
     console.log("error", error);
