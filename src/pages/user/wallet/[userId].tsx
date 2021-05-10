@@ -1,7 +1,7 @@
 import { Flex } from "@chakra-ui/layout";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Wallet } from "src/components/wallet/Wallet";
 import DoubleColLayout from "src/pages/_doubleColLayout";
 import { urqlClient } from "src/urql/urqlClient";
@@ -11,10 +11,14 @@ interface WalletProps {}
 
 const UserWallet: React.FC<WalletProps> = () => {
   const router = useRouter();
-  if (!router.query.userId) {
-    router.push("/onboarding/hiveLogin");
-  }
-  const userId = router.query.userId as string | "";
+  const [userId, setUserId] = useState("");
+  useEffect(() => {
+    if (!router.query.userId) {
+      router.push("/onboarding/hiveLogin");
+    }
+    setUserId(router.query.userId as string | "");
+  }, []);
+
   const [{ data, fetching, error }] = useUserQuery({ variables: { userId } });
   if (error) console.log(error);
   if (fetching || error || !data?.user)

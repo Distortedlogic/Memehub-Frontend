@@ -1,7 +1,7 @@
 import { useToast } from "@chakra-ui/toast";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Profile } from "src/components/user/Profile";
 import { useUserQuery } from "src/generated/graphql";
 import { urqlClient } from "src/urql/urqlClient";
@@ -11,7 +11,10 @@ interface UserProfileProps {}
 const UserProfile: React.FC<UserProfileProps> = () => {
   const toast = useToast();
   const router = useRouter();
-  const userId = router.query.userId as string | "";
+  const [userId, setUserId] = useState("");
+  useEffect(() => {
+    setUserId(router.query.userId as string | "");
+  }, []);
   const [{ data, error, fetching }] = useUserQuery({
     variables: { userId },
   });
