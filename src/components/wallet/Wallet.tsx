@@ -125,17 +125,6 @@ export const Wallet: React.FC<WalletProps> = (props) => {
       <Flex direction="column" h="80vh" p={6}>
         <Flex px={6} py={2} justifyContent="space-between" alignItems="center">
           <Flex direction="column">
-            <Text fontWeight="bold">Memehub Points (MHP)</Text>
-            <Text>
-              The primary points of the Memehub Platform, eventually will be
-              tokenized.
-            </Text>
-          </Flex>
-          <Text fontWeight="bold">{user.mhp}</Text>
-        </Flex>
-        <Divider />
-        <Flex px={6} py={2} justifyContent="space-between" alignItems="center">
-          <Flex direction="column">
             <Text fontWeight="bold">Good Boy Points (GBP)</Text>
             <Text>
               Points for trading on the stonk Market. In memory of the Nasdanq
