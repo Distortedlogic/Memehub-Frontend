@@ -41,7 +41,12 @@ const New: React.FC<NewProps> = () => {
           <MiniNavBar />
         </GridItem>
       </Grid>
-      <Grid templateColumns="3fr 1fr" w="100%" backgroundColor="black">
+      <Grid
+        minHeight="80vh"
+        templateColumns="3fr 1fr"
+        w="100%"
+        backgroundColor="black"
+      >
         <GridItem>
           <PagedRedditMemes
             hasMore={hasMore}
